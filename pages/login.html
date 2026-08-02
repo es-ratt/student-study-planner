@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Log in — Study Planner</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
+
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/dark-mode.css">
+  <link rel="stylesheet" href="../css/auth.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+
+  <div class="auth-page">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <i class="fa-solid fa-graduation-cap" style="color: var(--color-primary);"></i>
+        <span>Study Planner</span>
+      </div>
+
+      <h5 class="text-center mb-3">Welcome back</h5>
+
+      <form id="loginForm" novalidate>
+        <div class="mb-3">
+          <label class="form-label" for="email">Email</label>
+          <input type="email" class="form-control" id="email" required autocomplete="email" />
+        </div>
+
+        <div class="mb-2">
+          <label class="form-label" for="password">Password</label>
+          <input type="password" class="form-control" id="password" required autocomplete="current-password" />
+        </div>
+
+        <div class="text-end mb-3">
+          <a href="#" id="forgotPasswordLink" class="small">Forgot password?</a>
+        </div>
+
+        <div id="loginError" class="auth-error"></div>
+
+        <button type="submit" class="btn btn-primary">Log in</button>
+      </form>
+
+      <p class="auth-footer-link">
+        Don't have an account? <a href="register.html">Sign up</a>
+      </p>
+    </div>
+  </div>
+
+  <div class="modal fade" id="forgotPasswordModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Reset password</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p class="text-muted-custom">Enter your account email and we'll send a reset link.</p>
+          <input type="email" class="form-control" placeholder="you@example.com" />
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Send reset link</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+  <script type="module">
+    import { initTheme } from '../js/modules/themeManager.js';
+    import { loginUser } from '../js/modules/authManager.js';
+    import { showToast } from '../js/components/toast.js';
+
+    initTheme();
+
+    const forgotModal = new bootstrap.Modal(document.getElementById('forgotPasswordModal'));
+    document.getElementById('forgotPasswordLink').addEventListener('click', (e) => {
+      e.preventDefault();
+      forgotModal.show();
+    });
+
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const errorEl = document.getElementById('loginError');
+      errorEl.textContent = '';
+
+      const result = loginUser({ email, password });
+
+      if (!result.success) {
+        errorEl.textContent = result.error;
+        return;
+      }
+
+      showToast(`Welcome back, ${result.user.name}!`, 'success');
+      setTimeout(() => { window.location.href = 'dashboard.html'; }, 600);
+    });
+  </script>
+</body>
+</html>
