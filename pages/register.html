@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign up — Study Planner</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
+
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/dark-mode.css">
+  <link rel="stylesheet" href="../css/auth.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+
+  <div class="auth-page">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <i class="fa-solid fa-graduation-cap" style="color: var(--color-primary);"></i>
+        <span>Study Planner</span>
+      </div>
+
+      <h5 class="text-center mb-3">Create your account</h5>
+
+      <form id="registerForm" novalidate>
+        <div class="mb-3">
+          <label class="form-label" for="name">Full name</label>
+          <input type="text" class="form-control" id="name" required autocomplete="name" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="email">Email</label>
+          <input type="email" class="form-control" id="email" required autocomplete="email" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="password">Password</label>
+          <input type="password" class="form-control" id="password" required autocomplete="new-password" />
+          <div class="form-text">At least 8 characters, with a letter and a number.</div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="confirmPassword">Confirm password</label>
+          <input type="password" class="form-control" id="confirmPassword" required autocomplete="new-password" />
+        </div>
+
+        <div id="registerError" class="auth-error"></div>
+
+        <button type="submit" class="btn btn-primary">Create account</button>
+      </form>
+
+      <p class="auth-footer-link">
+        Already have an account? <a href="login.html">Log in</a>
+      </p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initTheme } from '../js/modules/themeManager.js';
+    import { registerUser } from '../js/modules/authManager.js';
+    import { isValidEmail, isValidPassword, passwordsMatch, isRequired } from '../js/utils/validators.js';
+    import { showToast } from '../js/components/toast.js';
+
+    initTheme();
+
+    document.getElementById('registerForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const errorEl = document.getElementById('registerError');
+      errorEl.textContent = '';
+
+      if (!isRequired(name)) {
+        errorEl.textContent = 'Name is required.';
+        return;
+      }
+      if (!isValidEmail(email)) {
+        errorEl.textContent = 'Enter a valid email address.';
+        return;
+      }
+      if (!isValidPassword(password)) {
+        errorEl.textContent = 'Password needs 8+ characters, with a letter and a number.';
+        return;
+      }
+      if (!passwordsMatch(password, confirmPassword)) {
+        errorEl.textContent = 'Passwords do not match.';
+        return;
+      }
+
+      const result = registerUser({ name, email, password });
+
+      if (!result.success) {
+        errorEl.textContent = result.error;
+        return;
+      }
+
+      showToast(`Account created — welcome, ${result.user.name}!`, 'success');
+      setTimeout(() => { window.location.href = 'login.html'; }, 800);
+    });
+  </script>
+</body>
+</html>
