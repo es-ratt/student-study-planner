@@ -1,0 +1,56 @@
+/* auth.css
+   Styles for login.html and register.html — centered card layout
+   over a soft gradient background. */
+
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 50%, #ff8a65 100%);
+  padding: 24px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-strong);
+  padding: 40px 36px;
+}
+
+.auth-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 24px;
+  font-weight: 700;
+  font-family: var(--font-display);
+}
+
+.auth-card .form-label {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.auth-card .btn-primary {
+  width: 100%;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+}
+
+.auth-footer-link {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.auth-error {
+  font-size: 0.85rem;
+  color: var(--color-danger);
+  min-height: 20px;
+}
