@@ -1,0 +1,75 @@
+/* dark-mode.css
+   Overrides the CSS variables from base.css when [data-theme="dark"]
+   is set on <html> — themeManager.js toggles that attribute.
+   Nothing here defines new component styles, only re-points variables. */
+
+[data-theme="dark"] {
+  --color-bg: #14121f;
+  --color-surface: #1e1c2e;
+  --color-surface-glass: rgba(30, 28, 46, 0.6);
+  --color-text: #f1f0f7;
+  --color-text-muted: #a6a1bd;
+  --color-border: #322f47;
+
+  --color-primary: #8b7cf6;
+  --color-primary-dark: #6c5ce7;
+  --color-secondary: #ff9d7a;
+
+  --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-strong: 0 16px 40px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .hero-mock-card {
+  background: rgba(30, 28, 46, 0.95);
+}
+
+[data-theme="dark"] .hero-mock-card div[style*="background:#f6f5fb"] {
+  background: #262438 !important;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+}
+
+[data-theme="dark"] .navbar-toggler-icon {
+  filter: invert(1);
+}
+
+[data-theme="dark"] .accordion-button {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+}
+
+[data-theme="dark"] .accordion-button:not(.collapsed) {
+  background-color: rgba(139, 124, 246, 0.15);
+  color: #fff;
+}
+
+[data-theme="dark"] .accordion-body {
+  background-color: var(--color-surface);
+  color: var(--color-text-muted);
+}
+
+[data-theme="dark"] .dropdown-menu {
+  background-color: var(--color-surface);
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .dropdown-item {
+  color: var(--color-text);
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+  background-color: var(--color-bg);
+}
+
+[data-theme="dark"] .form-control {
+  background-color: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+[data-theme="dark"] .form-control:focus {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+}
