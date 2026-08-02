@@ -1,0 +1,123 @@
+/* landing.css
+   Styles specific to index.html (the marketing/landing page).
+   Everything shared across pages stays in base.css. */
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding: 120px 0 100px;
+  background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 45%, #ff8a65 100%);
+  color: #fff;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -120px;
+  right: -120px;
+  width: 360px;
+  height: 360px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  filter: blur(10px);
+}
+
+.hero h1 {
+  color: #fff;
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.hero p.lead {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.15rem;
+  max-width: 560px;
+}
+
+.hero-mock-card {
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--color-text);
+  box-shadow: var(--shadow-strong);
+  padding: 24px;
+  transform: rotate(-2deg);
+}
+
+.feature-card {
+  border-radius: var(--radius-md);
+  padding: 32px 24px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  height: 100%;
+}
+
+.feature-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-soft);
+}
+
+.feature-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(108, 92, 231, 0.12);
+  color: var(--color-primary);
+  font-size: 1.4rem;
+  margin-bottom: 16px;
+}
+
+.step-number {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.testimonial-card {
+  border-radius: var(--radius-md);
+  padding: 28px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.testimonial-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--color-secondary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: rgba(108, 92, 231, 0.08);
+  color: var(--color-primary-dark);
+}
+
+.cta-band {
+  background: var(--color-text);
+  color: #fff;
+  border-radius: var(--radius-lg);
+  padding: 56px;
+  text-align: center;
+}
+
+.landing-footer {
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  padding: 48px 0 24px;
+}
