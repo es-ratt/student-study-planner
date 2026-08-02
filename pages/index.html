@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Study Planner — Get your semester together</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.1/aos.css">
+
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/dark-mode.css">
+  <link rel="stylesheet" href="../css/landing.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg glass-surface fixed-top px-3 py-2">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="index.html">
+        <i class="fa-solid fa-graduation-cap me-2" style="color: var(--color-primary);"></i>Study Planner
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#landingNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="landingNav">
+        <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+          <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
+          <li class="nav-item"><a class="nav-link" href="#how-it-works">How it works</a></li>
+          <li class="nav-item"><a class="nav-link" href="#faq">FAQ</a></li>
+          <li class="nav-item"><a class="nav-link" href="login.html">Log in</a></li>
+          <li class="nav-item">
+            <a class="btn btn-primary rounded-pill px-3" href="register.html">Get started free</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="container">
+      <div class="row align-items-center g-5" style="padding-top: 56px;">
+        <div class="col-lg-6" data-aos="fade-right">
+          <span class="badge rounded-pill bg-light text-dark mb-3 px-3 py-2">
+            <i class="fa-solid fa-star me-1"></i> Built for students, by students
+          </span>
+          <h1>Stop juggling deadlines in your head.</h1>
+          <p class="lead">
+            One place for your tasks, assignments, exams, and notes — with a planner
+            that actually keeps up with your semester, not the other way around.
+          </p>
+          <div class="d-flex gap-3 mt-4 flex-wrap">
+            <a href="register.html" class="btn btn-light btn-lg rounded-pill px-4 fw-semibold">
+              Get started free
+            </a>
+            <a href="#how-it-works" class="btn btn-outline-light btn-lg rounded-pill px-4">
+              See how it works
+            </a>
+          </div>
+        </div>
+
+        <div class="col-lg-6" data-aos="fade-left">
+          <div class="hero-mock-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <strong>Today</strong>
+              <span class="badge bg-success-subtle text-success">4-day streak 🔥</span>
+            </div>
+            <div class="d-flex align-items-center gap-2 mb-2 p-2 rounded" style="background:#f6f5fb;">
+              <i class="fa-solid fa-circle-check text-success"></i>
+              <span class="text-decoration-line-through text-muted-custom">Finish Physics problem set</span>
+            </div>
+            <div class="d-flex align-items-center gap-2 mb-2 p-2 rounded" style="background:#f6f5fb;">
+              <i class="fa-regular fa-circle text-muted-custom"></i>
+              <span>Read Chapter 6 — Data Structures</span>
+            </div>
+            <div class="d-flex align-items-center gap-2 p-2 rounded" style="background:#f6f5fb;">
+              <i class="fa-regular fa-circle text-muted-custom"></i>
+              <span>DBMS exam in 3 days — 60% prepped</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section id="features" class="section-padding">
+    <div class="container">
+      <div class="text-center mb-5" data-aos="fade-up">
+        <h2 class="fw-bold">Everything your semester throws at you</h2>
+        <p class="text-muted-custom">One app instead of five sticky-note apps and a panic spreadsheet.</p>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="0">
+          <div class="feature-card">
+            <div class="feature-icon"><i class="fa-solid fa-list-check"></i></div>
+            <h5>Task &amp; Study Planner</h5>
+            <p class="text-muted-custom mb-0">Add, prioritize, and track tasks by subject and deadline — no more forgotten assignments.</p>
+          </div>
+        </div>
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+          <div class="feature-card">
+            <div class="feature-icon"><i class="fa-solid fa-calendar-days"></i></div>
+            <h5>Smart Calendar</h5>
+            <p class="text-muted-custom mb-0">See study sessions, assignments, and exams color-coded on one calendar view.</p>
+          </div>
+        </div>
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+          <div class="feature-card">
+            <div class="feature-icon"><i class="fa-solid fa-clock"></i></div>
+            <h5>Pomodoro Timer</h5>
+            <p class="text-muted-custom mb-0">25/5 focus sessions built in, with your study streak tracked automatically.</p>
+          </div>
+        </div>
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="0">
+          <div class="feature-card">
+            <div class="feature-icon"><i class="fa-solid fa-chart-line"></i></div>
+            <h5>Analytics</h5>
+            <p class="text-muted-custom mb-0">Weekly/monthly study hours, task completion, and a productivity score at a glance.</p>
+          </div>
+        </div>
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+          <div class="feature-card">
+            <div class="feature-icon"><i class="fa-solid fa-note-sticky"></i></div>
+            <h5>Notes</h5>
+            <p class="text-muted-custom mb-0">Rich-text notes with pinning and search, organized by subject and category.</p>
+          </div>
+        </div>
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+          <div class="feature-card">
+            <div class="feature-icon"><i class="fa-solid fa-bell"></i></div>
+            <h5>Reminders</h5>
+            <p class="text-muted-custom mb-0">Browser notifications for deadlines and exams before they sneak up on you.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how-it-works" class="section-padding" style="background: var(--color-surface);">
+    <div class="container">
+      <div class="text-center mb-5" data-aos="fade-up">
+        <h2 class="fw-bold">Three steps. That's it.</h2>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-4" data-aos="fade-up">
+          <div class="d-flex gap-3">
+            <div class="step-number">1</div>
+            <div>
+              <h6 class="fw-bold">Add your subjects</h6>
+              <p class="text-muted-custom">Set up each course with your teacher, credits, and color.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+          <div class="d-flex gap-3">
+            <div class="step-number">2</div>
+            <div>
+              <h6 class="fw-bold">Drop in tasks &amp; deadlines</h6>
+              <p class="text-muted-custom">Assignments, exams, and study sessions land on your calendar automatically.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+          <div class="d-flex gap-3">
+            <div class="step-number">3</div>
+            <div>
+              <h6 class="fw-bold">Let the dashboard drive</h6>
+              <p class="text-muted-custom">Check one screen every morning and know exactly what today needs.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-padding">
+    <div class="container">
+      <div class="text-center mb-5" data-aos="fade-up">
+        <h2 class="fw-bold">Students actually use this one</h2>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-4" data-aos="fade-up">
+          <div class="testimonial-card">
+            <p>"I stopped missing assignment deadlines the week I started using this. The countdown badges are what did it."</p>
+            <div class="d-flex align-items-center gap-2 mt-3">
+              <div class="testimonial-avatar">R</div>
+              <div><strong>Rafi</strong><br><small class="text-muted-custom">CSE, 5th semester</small></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+          <div class="testimonial-card">
+            <p>"The Pomodoro + streak combo is weirdly motivating. I've studied every day for three weeks straight."</p>
+            <div class="d-flex align-items-center gap-2 mt-3">
+              <div class="testimonial-avatar">N</div>
+              <div><strong>Nusrat</strong><br><small class="text-muted-custom">BBA, 3rd semester</small></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+          <div class="testimonial-card">
+            <p>"Exam prep percentage sounds small but it genuinely changed how I plan the week before finals."</p>
+            <div class="d-flex align-items-center gap-2 mt-3">
+              <div class="testimonial-avatar">S</div>
+              <div><strong>Shuvo</strong><br><small class="text-muted-custom">SWE, 6th semester</small></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq" class="section-padding" style="background: var(--color-surface);">
+    <div class="container" style="max-width: 760px;">
+      <div class="text-center mb-5" data-aos="fade-up">
+        <h2 class="fw-bold">Questions, answered</h2>
+      </div>
+      <div class="accordion" id="faqAccordion" data-aos="fade-up">
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+              Is my data stored anywhere online?
+            </button>
+          </h2>
+          <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">Everything is stored locally in your browser via Local Storage — nothing is sent to a server.</div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+              Does it work on my phone?
+            </button>
+          </h2>
+          <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">Yes — the layout is fully responsive down to mobile screen sizes.</div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+              Is it free?
+            </button>
+          </h2>
+          <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">Yes, completely free — no account tier or paywall.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-padding">
+    <div class="container">
+      <div class="cta-band" data-aos="zoom-in">
+        <h2 class="fw-bold">Your semester deserves a real plan.</h2>
+        <p class="text-white-50 mb-4">Set it up in under two minutes — no credit card, no clutter.</p>
+        <a href="register.html" class="btn btn-light btn-lg rounded-pill px-4 fw-semibold">Get started free</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="landing-footer">
+    <div class="container d-flex flex-wrap justify-content-between align-items-center gap-3">
+      <span class="fw-bold"><i class="fa-solid fa-graduation-cap me-2" style="color: var(--color-primary);"></i>Study Planner</span>
+      <div class="d-flex gap-4">
+        <a href="#features" class="text-muted-custom">Features</a>
+        <a href="#faq" class="text-muted-custom">FAQ</a>
+        <a href="login.html" class="text-muted-custom">Log in</a>
+      </div>
+      <small class="text-muted-custom">&copy; 2026 Study Planner. Built for students.</small>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.1/aos.js"></script>
+  <script>AOS.init({ duration: 700, once: true });</script>
+</body>
+</html>
