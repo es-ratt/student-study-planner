@@ -1,7 +1,3 @@
-// navbar.js
-// Renders the top sticky navbar, shared across every logged-in page.
-// Call renderNavbar() once per page load, after the DOM's #navbarRoot exists.
-
 import { getCurrentUser, logoutUser } from '../modules/authManager.js';
 import { getCurrentTheme, toggleTheme } from '../modules/themeManager.js';
 
