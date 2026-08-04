@@ -1,0 +1,76 @@
+/* calendar.css
+   Re-themes FullCalendar.js to match the app's design tokens. Loaded
+   only on calendar.html, after FullCalendar's own stylesheet/script. */
+
+#calendarRoot {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  box-shadow: var(--shadow-soft);
+}
+
+.fc {
+  font-family: var(--font-body);
+  color: var(--color-text);
+}
+
+.fc .fc-toolbar-title {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+}
+
+.fc .fc-button-primary {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+.fc .fc-button-primary:hover {
+  background-color: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+}
+
+.fc .fc-button-primary:disabled {
+  background-color: var(--color-text-muted);
+  border-color: var(--color-text-muted);
+}
+
+.fc-theme-standard td,
+.fc-theme-standard th,
+.fc-theme-standard .fc-scrollgrid {
+  border-color: var(--color-border);
+}
+
+.fc-daygrid-day-number,
+.fc-col-header-cell-cushion {
+  color: var(--color-text);
+}
+
+.fc-event {
+  border: none;
+  border-radius: 6px;
+  padding: 1px 4px;
+  font-size: 0.78rem;
+}
+
+.calendar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.calendar-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}

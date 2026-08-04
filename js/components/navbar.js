@@ -15,6 +15,10 @@ export function renderNavbar(rootId = 'navbarRoot') {
   root.innerHTML = `
     <nav class="navbar navbar-expand-lg sticky-top shadow-sm px-3 study-navbar">
       <div class="container-fluid">
+        <button id="sidebarToggleBtn" class="btn btn-sm btn-outline-secondary d-lg-none me-2" aria-label="Toggle menu">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+
         <a class="navbar-brand fw-bold" href="dashboard.html">
           <i class="fa-solid fa-graduation-cap me-2"></i>Study Planner
         </a>
@@ -46,6 +50,14 @@ export function renderNavbar(rootId = 'navbarRoot') {
 }
 
 function attachNavbarEvents() {
+  const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+  if (sidebarToggleBtn) {
+    sidebarToggleBtn.addEventListener('click', () => {
+      const sidebar = document.querySelector('.sidebar');
+      if (sidebar) sidebar.classList.toggle('sidebar-open');
+    });
+  }
+
   const themeBtn = document.getElementById('themeToggleBtn');
   if (themeBtn) {
     themeBtn.addEventListener('click', () => {

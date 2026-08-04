@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Settings — Study Planner</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
+
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/dark-mode.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+  <div id="navbarRoot"></div>
+  <div id="sidebarRoot"></div>
+
+  <main id="pageContent" class="main-content">
+    <div class="page-header"><h2>Settings</h2></div>
+
+    <div class="row g-3">
+      <div class="col-lg-6">
+        <div class="widget-card mb-3">
+          <div class="widget-title">Appearance</div>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span>Dark Mode</span>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="darkModeSwitch" style="width:2.5em;height:1.4em;">
+            </div>
+          </div>
+          <label class="form-label">Theme Accent Color</label>
+          <input type="color" class="form-control form-control-color" id="accentColorPicker" />
+        </div>
+
+        <div class="widget-card">
+          <div class="widget-title">Notifications</div>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span>Enable notifications</span>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="notificationsSwitch" style="width:2.5em;height:1.4em;">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Daily reminder time</label>
+            <input type="time" class="form-control" id="dailyReminderTime" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Exam reminder (days before)</label>
+            <input type="number" class="form-control" id="examReminderDays" min="1" max="14" />
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="widget-card border-danger">
+          <div class="widget-title text-danger">Danger Zone</div>
+          <p class="text-muted-custom small">This clears every subject, task, note, and setting stored in this browser. This cannot be undone.</p>
+          <button class="btn btn-outline-danger" id="resetDataBtn"><i class="fa-solid fa-trash me-1"></i>Reset Local Storage</button>
+        </div>
+
+        <div class="widget-card mt-3">
+          <div class="widget-title">Session</div>
+          <button class="btn btn-outline-secondary" id="logoutBtnSettings"><i class="fa-solid fa-arrow-right-from-bracket me-1"></i>Logout</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="fabRoot"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="../js/app.js"></script>
+  <script type="module">
+    import { getCurrentTheme, toggleTheme, getAccentColor, setAccentColor } from '../js/modules/themeManager.js';
+    import { getSettings, updateSettings, resetAllData, requestNotificationPermission } from '../js/modules/settingsManager.js';
+    import { logoutUser } from '../js/modules/authManager.js';
+    import { showToast } from '../js/components/toast.js';
+
+    function loadSettings() {
+      document.getElementById('darkModeSwitch').checked = getCurrentTheme() === 'dark';
+      document.getElementById('accentColorPicker').value = getAccentColor();
+
+      const settings = getSettings();
+      document.getElementById('notificationsSwitch').checked = settings.notificationsEnabled;
+      document.getElementById('dailyReminderTime').value = settings.dailyReminderTime;
+      document.getElementById('examReminderDays').value = settings.examReminderDaysBefore;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadSettings();
+
+      document.getElementById('darkModeSwitch').addEventListener('change', () => {
+        toggleTheme();
+        showToast('Theme updated', 'success');
+      });
+
+      document.getElementById('accentColorPicker').addEventListener('input', (e) => {
+        setAccentColor(e.target.value);
+      });
+
+      document.getElementById('notificationsSwitch').addEventListener('change', async (e) => {
+        updateSettings({ notificationsEnabled: e.target.checked });
+        if (e.target.checked) await requestNotificationPermission();
+        showToast('Notification settings updated', 'success');
+      });
+
+      document.getElementById('dailyReminderTime').addEventListener('change', (e) => {
+        updateSettings({ dailyReminderTime: e.target.value });
+      });
+
+      document.getElementById('examReminderDays').addEventListener('change', (e) => {
+        updateSettings({ examReminderDaysBefore: parseInt(e.target.value, 10) || 3 });
+      });
+
+      document.getElementById('resetDataBtn').addEventListener('click', () => {
+        if (!confirm('This will permanently delete all your data. Continue?')) return;
+        resetAllData();
+        showToast('All data cleared', 'success');
+        setTimeout(() => { window.location.href = 'login.html'; }, 800);
+      });
+
+      document.getElementById('logoutBtnSettings').addEventListener('click', () => {
+        logoutUser();
+        window.location.href = 'login.html';
+      });
+    });
+  </script>
+</body>
+</html>

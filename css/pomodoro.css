@@ -1,0 +1,92 @@
+/* pomodoro.css
+   Circular timer + session dots for pomodoro.html. */
+
+.pomodoro-wrap {
+  max-width: 420px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.timer-ring {
+  position: relative;
+  width: 260px;
+  height: 260px;
+  margin: 0 auto 28px;
+}
+
+.timer-ring svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.timer-ring circle {
+  fill: none;
+  stroke-width: 10;
+}
+
+.timer-ring .ring-bg {
+  stroke: var(--color-border);
+}
+
+.timer-ring .ring-progress {
+  stroke: var(--accent-color);
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s linear;
+}
+
+.timer-display {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.timer-display .time {
+  font-family: var(--font-display);
+  font-size: 2.6rem;
+  font-weight: 700;
+}
+
+.timer-display .mode-label {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.timer-controls {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.timer-controls .btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.session-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.session-dots .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-border);
+}
+
+.session-dots .dot.filled {
+  background: var(--accent-color);
+}

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notes — Study Planner</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
+
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/dark-mode.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/notes.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+  <div id="navbarRoot"></div>
+  <div id="sidebarRoot"></div>
+
+  <main id="pageContent" class="main-content">
+    <div class="page-header">
+      <h2>Notes</h2>
+      <button class="btn btn-primary rounded-pill px-4" id="addNoteBtn"><i class="fa-solid fa-plus me-1"></i>New Note</button>
+    </div>
+
+    <div class="widget-card mb-3">
+      <div class="row g-2">
+        <div class="col-md-8">
+          <input type="text" id="noteSearch" class="form-control" placeholder="Search notes..." />
+        </div>
+        <div class="col-md-4">
+          <select id="noteCategoryFilter" class="form-select">
+            <option value="all">All categories</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="notes-grid" id="notesGrid"></div>
+  </main>
+
+  <div id="fabRoot"></div>
+
+  <div class="modal fade" id="noteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="noteModalTitle">New Note</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="noteForm">
+            <input type="hidden" id="noteId" />
+            <div class="mb-3">
+              <label class="form-label">Title</label>
+              <input type="text" class="form-control" id="noteTitle" placeholder="Untitled note" />
+            </div>
+            <div class="row">
+              <div class="col-6 mb-3">
+                <label class="form-label">Category</label>
+                <input type="text" class="form-control" id="noteCategory" placeholder="e.g. Biology" />
+              </div>
+              <div class="col-6 mb-3">
+                <label class="form-label">Subject</label>
+                <select class="form-select" id="noteSubject"><option value="">None</option></select>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="d-flex gap-2 mb-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-cmd="bold"><i class="fa-solid fa-bold"></i></button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-cmd="italic"><i class="fa-solid fa-italic"></i></button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-cmd="insertUnorderedList"><i class="fa-solid fa-list-ul"></i></button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="insertCodeBtn"><i class="fa-solid fa-code"></i></button>
+              </div>
+              <div id="noteContent" class="note-editor" contenteditable="true"></div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="saveNoteBtn">Save Note</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="../js/app.js"></script>
+  <script type="module">
+    import {
+      addNote, updateNote, deleteNote, togglePinNote, getNoteById,
+      searchNotes, filterNotesByCategory, getSortedNotes, getCategories,
+    } from '../js/modules/noteManager.js';
+    import { getAllSubjects } from '../js/modules/subjectManager.js';
+    import { escapeHTML } from '../js/utils/domHelpers.js';
+    import { showToast } from '../js/components/toast.js';
+
+    const noteModal = new bootstrap.Modal(document.getElementById('noteModal'));
+
+    function populateSelectOptions() {
+      document.getElementById('noteSubject').innerHTML = '<option value="">None</option>' +
+        getAllSubjects().map((s) => `<option value="${s.id}">${s.name}</option>`).join('');
+
+      const categorySelect = document.getElementById('noteCategoryFilter');
+      const current = categorySelect.value;
+      categorySelect.innerHTML = '<option value="all">All categories</option>' +
+        getCategories().map((c) => `<option value="${c}">${c}</option>`).join('');
+      categorySelect.value = current || 'all';
+    }
+
+    function getFilteredNotes() {
+      const query = document.getElementById('noteSearch').value;
+      const category = document.getElementById('noteCategoryFilter').value;
+
+      let notes = query ? searchNotes(query) : filterNotesByCategory(category);
+      if (query && category !== 'all') notes = notes.filter((n) => n.category === category);
+
+      return getSortedNotes(notes);
+    }
+
+    function renderNotes() {
+      const container = document.getElementById('notesGrid');
+      const notes = getFilteredNotes();
+
+      if (notes.length === 0) {
+        container.innerHTML = `<div class="empty-state"><i class="fa-solid fa-note-sticky"></i><p>No notes yet. Create your first one!</p></div>`;
+        return;
+      }
+
+      container.innerHTML = notes.map((n) => `
+        <div class="note-card ${n.pinned ? 'is-pinned' : ''}" data-id="${n.id}">
+          <button class="note-pin-btn ${n.pinned ? 'pinned' : ''}"><i class="fa-solid fa-thumbtack"></i></button>
+          <div class="note-title">${escapeHTML(n.title)}</div>
+          <div class="note-content">${n.content}</div>
+          <span class="note-category-chip">${escapeHTML(n.category)}</span>
+          <div class="d-flex gap-2 mt-3">
+            <button class="btn btn-sm btn-outline-primary edit-note-btn">Edit</button>
+            <button class="btn btn-sm btn-outline-danger delete-note-btn">Delete</button>
+          </div>
+        </div>
+      `).join('');
+
+      attachNoteEvents();
+    }
+
+    function attachNoteEvents() {
+      document.querySelectorAll('.note-pin-btn').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          togglePinNote(e.target.closest('.note-card').dataset.id);
+          renderNotes();
+        });
+      });
+
+      document.querySelectorAll('.edit-note-btn').forEach((btn) => {
+        btn.addEventListener('click', (e) => openEditModal(e.target.closest('.note-card').dataset.id));
+      });
+
+      document.querySelectorAll('.delete-note-btn').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          const id = e.target.closest('.note-card').dataset.id;
+          if (!confirm('Delete this note?')) return;
+          deleteNote(id);
+          showToast('Note deleted', 'success');
+          populateSelectOptions();
+          renderNotes();
+        });
+      });
+    }
+
+    function openAddModal() {
+      document.getElementById('noteModalTitle').textContent = 'New Note';
+      document.getElementById('noteId').value = '';
+      document.getElementById('noteForm').reset();
+      document.getElementById('noteContent').innerHTML = '';
+      noteModal.show();
+    }
+
+    function openEditModal(id) {
+      const note = getNoteById(id);
+      if (!note) return;
+      document.getElementById('noteModalTitle').textContent = 'Edit Note';
+      document.getElementById('noteId').value = note.id;
+      document.getElementById('noteTitle').value = note.title;
+      document.getElementById('noteCategory').value = note.category;
+      document.getElementById('noteSubject').value = note.subjectId || '';
+      document.getElementById('noteContent').innerHTML = note.content;
+      noteModal.show();
+    }
+
+    function saveNote() {
+      const id = document.getElementById('noteId').value;
+      const payload = {
+        title: document.getElementById('noteTitle').value.trim() || 'Untitled note',
+        category: document.getElementById('noteCategory').value.trim() || 'General',
+        subjectId: document.getElementById('noteSubject').value || null,
+        content: document.getElementById('noteContent').innerHTML,
+      };
+
+      if (id) {
+        updateNote(id, payload);
+        showToast('Note updated', 'success');
+      } else {
+        addNote(payload);
+        showToast('Note created', 'success');
+      }
+
+      noteModal.hide();
+      populateSelectOptions();
+      renderNotes();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      populateSelectOptions();
+      renderNotes();
+
+      document.getElementById('addNoteBtn').addEventListener('click', openAddModal);
+      document.getElementById('saveNoteBtn').addEventListener('click', saveNote);
+      document.getElementById('noteSearch').addEventListener('input', renderNotes);
+      document.getElementById('noteCategoryFilter').addEventListener('change', renderNotes);
+
+      document.querySelectorAll('#noteForm [data-cmd]').forEach((btn) => {
+        btn.addEventListener('click', () => document.execCommand(btn.dataset.cmd, false, null));
+      });
+      document.getElementById('insertCodeBtn').addEventListener('click', () => {
+        document.execCommand('insertHTML', false, '<pre><code>your code here</code></pre>');
+      });
+
+      document.addEventListener('quickadd:note', openAddModal);
+    });
+  </script>
+</body>
+</html>

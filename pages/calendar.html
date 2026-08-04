@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calendar — Study Planner</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
+
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/dark-mode.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/calendar.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+  <div id="navbarRoot"></div>
+  <div id="sidebarRoot"></div>
+
+  <main id="pageContent" class="main-content">
+    <div class="page-header">
+      <h2>Calendar</h2>
+      <button class="btn btn-primary rounded-pill px-4" id="addEventBtn"><i class="fa-solid fa-plus me-1"></i>Add Event</button>
+    </div>
+
+    <div class="calendar-legend">
+      <span><span class="legend-dot" style="background:#6c5ce7"></span>Task</span>
+      <span><span class="legend-dot" style="background:#ff8a65"></span>Assignment</span>
+      <span><span class="legend-dot" style="background:#e5566f"></span>Exam</span>
+      <span><span class="legend-dot" style="background:#33b679"></span>Study Session</span>
+      <span><span class="legend-dot" style="background:#f4b942"></span>Event</span>
+    </div>
+
+    <div id="calendarRoot"></div>
+  </main>
+
+  <div id="fabRoot"></div>
+
+  <div class="modal fade" id="eventModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Add Calendar Event</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="eventForm">
+            <div class="mb-3">
+              <label class="form-label">Title *</label>
+              <input type="text" class="form-control" id="eventTitle" required />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Type</label>
+              <select class="form-select" id="eventType">
+                <option value="study_session">Study Session</option>
+                <option value="event">Event</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Subject</label>
+              <select class="form-select" id="eventSubject"><option value="">None</option></select>
+            </div>
+            <div class="row">
+              <div class="col-6 mb-3">
+                <label class="form-label">Start Date *</label>
+                <input type="date" class="form-control" id="eventDate" required />
+              </div>
+              <div class="col-6 mb-3">
+                <label class="form-label">End Date</label>
+                <input type="date" class="form-control" id="eventEndDate" />
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="saveEventBtn">Save Event</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.15/index.global.min.js"></script>
+  <script type="module" src="../js/app.js"></script>
+  <script type="module">
+    import { getCalendarEvents, addCustomEvent } from '../js/modules/calendarManager.js';
+    import { getAllSubjects } from '../js/modules/subjectManager.js';
+    import { showToast } from '../js/components/toast.js';
+
+    const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+    let calendar;
+
+    function populateSubjectOptions() {
+      const select = document.getElementById('eventSubject');
+      select.innerHTML = '<option value="">None</option>' +
+        getAllSubjects().map((s) => `<option value="${s.id}">${s.name}</option>`).join('');
+    }
+
+    function initCalendar() {
+      const el = document.getElementById('calendarRoot');
+      calendar = new FullCalendar.Calendar(el, {
+        initialView: 'dayGridMonth',
+        headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay' },
+        height: 'auto',
+        events: getCalendarEvents(),
+      });
+      calendar.render();
+    }
+
+    function refreshCalendar() {
+      calendar.removeAllEvents();
+      getCalendarEvents().forEach((ev) => calendar.addEvent(ev));
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      populateSubjectOptions();
+      initCalendar();
+
+      document.getElementById('addEventBtn').addEventListener('click', () => {
+        document.getElementById('eventForm').reset();
+        eventModal.show();
+      });
+
+      document.getElementById('saveEventBtn').addEventListener('click', () => {
+        const title = document.getElementById('eventTitle').value.trim();
+        const date = document.getElementById('eventDate').value;
+        if (!title || !date) { showToast('Title and start date are required', 'error'); return; }
+
+        addCustomEvent({
+          title,
+          type: document.getElementById('eventType').value,
+          subjectId: document.getElementById('eventSubject').value || null,
+          date,
+          endDate: document.getElementById('eventEndDate').value || date,
+        });
+
+        showToast('Event added to calendar', 'success');
+        eventModal.hide();
+        refreshCalendar();
+      });
+    });
+  </script>
+</body>
+</html>

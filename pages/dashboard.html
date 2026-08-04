@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — Study Planner</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
+
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/dark-mode.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+  <div id="navbarRoot"></div>
+  <div id="sidebarRoot"></div>
+
+  <main id="pageContent" class="main-content">
+
+    <div class="welcome-banner">
+      <h3 id="welcomeMessage">Welcome back!</h3>
+      <p class="mb-0" id="welcomeSubtext">Here's what's on your plate today.</p>
+    </div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-6 col-lg-3">
+        <div class="stat-card">
+          <div class="stat-icon" style="background: var(--color-primary);"><i class="fa-solid fa-list-check"></i></div>
+          <div class="stat-value" id="statTodayTasks">0</div>
+          <div class="text-muted-custom small">Today's Tasks</div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="stat-card">
+          <div class="stat-icon" style="background: var(--color-success);"><i class="fa-solid fa-clock"></i></div>
+          <div class="stat-value" id="statStudyHours">0h</div>
+          <div class="text-muted-custom small">Today's Study Hours</div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="stat-card">
+          <div class="stat-icon" style="background: var(--color-danger);"><i class="fa-solid fa-graduation-cap"></i></div>
+          <div class="stat-value" id="statUpcomingExams">0</div>
+          <div class="text-muted-custom small">Upcoming Exams</div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="stat-card">
+          <div class="stat-icon" style="background: var(--color-secondary);"><i class="fa-solid fa-fire"></i></div>
+          <div class="stat-value" id="statStreak">0</div>
+          <div class="text-muted-custom small">Day Study Streak</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-lg-6">
+        <div class="widget-card">
+          <div class="widget-title"><span>Today's Tasks</span> <a href="planner.html" class="small">View all</a></div>
+          <div id="dashTodayTasks"></div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="widget-card">
+          <div class="widget-title"><span>Upcoming Assignments</span> <a href="assignments.html" class="small">View all</a></div>
+          <div id="dashUpcomingAssignments"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-lg-4">
+        <div class="widget-card">
+          <div class="widget-title"><span>Upcoming Exams</span> <a href="exams.html" class="small">View all</a></div>
+          <div id="dashUpcomingExams"></div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="widget-card">
+          <div class="widget-title"><span>Recent Notes</span> <a href="notes.html" class="small">View all</a></div>
+          <div id="dashRecentNotes"></div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="widget-card">
+          <div class="widget-title"><span>This Week</span> <a href="calendar.html" class="small">Open calendar</a></div>
+          <div id="dashMiniCalendar" class="mini-calendar-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-lg-6">
+        <div class="widget-card">
+          <div class="widget-title"><span>Weekly Study Hours</span></div>
+          <canvas id="dashWeeklyChart" height="160"></canvas>
+        </div>
+      </div>
+      <div class="col-lg-3 col-6">
+        <div class="widget-card text-center">
+          <div class="widget-title justify-content-center">Goal Progress</div>
+          <div class="progress-thin mb-2">
+            <div id="goalProgressBar" class="progress-bar" style="width:0%"></div>
+          </div>
+          <div class="small text-muted-custom" id="goalProgressText">0% of weekly goal</div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-6">
+        <div class="widget-card text-center">
+          <div class="widget-title justify-content-center">Productivity</div>
+          <div class="stat-value" id="productivityScore">0%</div>
+          <div class="small text-muted-custom">Tasks & assignments completed</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="quote-banner mb-3">
+      <i class="fa-solid fa-quote-left me-2"></i><span id="motivationalQuote">Small steps every day lead to big results.</span>
+    </div>
+
+    <div class="widget-card">
+      <div class="widget-title">Quick Add Task</div>
+      <form id="quickAddForm" class="d-flex gap-2 flex-wrap">
+        <input type="text" id="quickAddInput" class="form-control quick-add-input flex-grow-1" placeholder="e.g. Read Chapter 4 by Friday" required />
+        <button type="submit" class="btn btn-primary rounded-pill px-4">Add</button>
+      </form>
+    </div>
+
+  </main>
+
+  <div id="fabRoot"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+  <script type="module" src="../js/app.js"></script>
+  <script type="module">
+    import { getCurrentUser } from '../js/modules/authManager.js';
+    import { getTodayTasks, getUpcomingTasks, addTask } from '../js/modules/taskManager.js';
+    import { getUpcomingAssignments } from '../js/modules/assignmentManager.js';
+    import { getUpcomingExams } from '../js/modules/examManager.js';
+    import { getRecentNotes } from '../js/modules/noteManager.js';
+    import { getSubjectById } from '../js/modules/subjectManager.js';
+    import { getWeeklyStudyHours, getProductivityScore, getStudyStreak } from '../js/modules/analyticsManager.js';
+    import { formatCountdown, formatDate } from '../js/utils/dateHelpers.js';
+    import { showToast } from '../js/components/toast.js';
+
+    const QUOTES = [
+      "Small steps every day lead to big results.",
+      "Discipline is choosing what you want most over what you want now.",
+      "Focus on progress, not perfection.",
+      "Your future is created by what you do today, not tomorrow.",
+      "Consistency beats intensity.",
+    ];
+
+    function initWelcome() {
+      const user = getCurrentUser();
+      document.getElementById('welcomeMessage').textContent = user ? `Welcome back, ${user.name.split(' ')[0]}!` : 'Welcome back!';
+      document.getElementById('motivationalQuote').textContent = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+    }
+
+    function renderTaskList(containerId, tasks, emptyText) {
+      const container = document.getElementById(containerId);
+      if (tasks.length === 0) {
+        container.innerHTML = `<div class="empty-state py-3"><p class="mb-0">${emptyText}</p></div>`;
+        return;
+      }
+      container.innerHTML = tasks.slice(0, 5).map((t) => {
+        const subject = t.subjectId ? getSubjectById(t.subjectId) : null;
+        return `
+          <div class="list-row ${t.completed ? 'is-completed' : ''}">
+            ${subject ? `<span class="subject-dot" style="background:${subject.color}"></span>` : ''}
+            <p class="list-row-title flex-grow-1">${t.title}</p>
+            <span class="priority-badge priority-${t.priority}">${t.priority}</span>
+          </div>`;
+      }).join('');
+    }
+
+    function renderAssignments() {
+      const list = getUpcomingAssignments();
+      const container = document.getElementById('dashUpcomingAssignments');
+      if (list.length === 0) {
+        container.innerHTML = `<div class="empty-state py-3"><p class="mb-0">No upcoming assignments 🎉</p></div>`;
+        return;
+      }
+      container.innerHTML = list.slice(0, 5).map((a) => `
+        <div class="list-row">
+          <p class="list-row-title flex-grow-1">${a.title}</p>
+          <span class="status-badge status-pending">${formatCountdown(a.deadline)}</span>
+        </div>`).join('');
+    }
+
+    function renderExams() {
+      const list = getUpcomingExams();
+      const container = document.getElementById('dashUpcomingExams');
+      if (list.length === 0) {
+        container.innerHTML = `<div class="empty-state py-3"><p class="mb-0">No exams scheduled soon</p></div>`;
+        return;
+      }
+      container.innerHTML = list.slice(0, 5).map((e) => `
+        <div class="list-row">
+          <p class="list-row-title flex-grow-1">${e.name}</p>
+          <span class="status-badge status-overdue">${formatCountdown(e.date)}</span>
+        </div>`).join('');
+    }
+
+    function renderNotesWidget() {
+      const notes = getRecentNotes(3);
+      const container = document.getElementById('dashRecentNotes');
+      if (notes.length === 0) {
+        container.innerHTML = `<div class="empty-state py-3"><p class="mb-0">No notes yet</p></div>`;
+        return;
+      }
+      container.innerHTML = notes.map((n) => `
+        <div class="list-row">
+          <p class="list-row-title flex-grow-1">${n.title}</p>
+          <span class="small text-muted-custom">${formatDate(n.updatedAt)}</span>
+        </div>`).join('');
+    }
+
+    function renderMiniCalendar() {
+      const upcoming = [...getUpcomingTasks(7), ...getUpcomingExams(7)];
+      const container = document.getElementById('dashMiniCalendar');
+      if (upcoming.length === 0) {
+        container.innerHTML = `<div class="empty-state py-3"><p class="mb-0">Nothing on the calendar this week</p></div>`;
+        return;
+      }
+      container.innerHTML = upcoming.slice(0, 6).map((item) => `
+        <div class="mini-calendar-item"><span>${item.title || item.name}</span><span>${formatDate(item.deadline || item.date)}</span></div>
+      `).join('');
+    }
+
+    function renderStats() {
+      document.getElementById('statTodayTasks').textContent = getTodayTasks().length;
+      document.getElementById('statUpcomingExams').textContent = getUpcomingExams().length;
+      document.getElementById('statStreak').textContent = getStudyStreak();
+      document.getElementById('productivityScore').textContent = `${getProductivityScore()}%`;
+
+      const weekly = getWeeklyStudyHours();
+      const todayHours = weekly.data[weekly.data.length - 1] || 0;
+      document.getElementById('statStudyHours').textContent = `${todayHours}h`;
+
+      const weeklyGoalHours = 20;
+      const totalWeekHours = weekly.data.reduce((sum, h) => sum + h, 0);
+      const pct = Math.min(100, Math.round((totalWeekHours / weeklyGoalHours) * 100));
+      document.getElementById('goalProgressBar').style.width = `${pct}%`;
+      document.getElementById('goalProgressText').textContent = `${pct}% of weekly goal (${totalWeekHours}h / ${weeklyGoalHours}h)`;
+
+      new Chart(document.getElementById('dashWeeklyChart'), {
+        type: 'bar',
+        data: {
+          labels: weekly.labels,
+          datasets: [{ label: 'Hours', data: weekly.data, backgroundColor: 'rgba(108, 92, 231, 0.7)', borderRadius: 6 }],
+        },
+        options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } },
+      });
+    }
+
+    function initQuickAdd() {
+      document.getElementById('quickAddForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const input = document.getElementById('quickAddInput');
+        const title = input.value.trim();
+        if (!title) return;
+
+        addTask({ title, priority: 'medium', deadline: new Date().toISOString().split('T')[0] });
+        input.value = '';
+        showToast('Task added', 'success');
+        renderTaskList('dashTodayTasks', getTodayTasks(), 'No tasks for today 🎉');
+        renderStats();
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initWelcome();
+      renderTaskList('dashTodayTasks', getTodayTasks(), 'No tasks for today 🎉');
+      renderAssignments();
+      renderExams();
+      renderNotesWidget();
+      renderMiniCalendar();
+      renderStats();
+      initQuickAdd();
+    });
+  </script>
+</body>
+</html>

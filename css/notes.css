@@ -1,0 +1,90 @@
+/* notes.css
+   Masonry-style note grid + sticky-note look for notes.html. */
+
+.notes-grid {
+  columns: 280px 4;
+  column-gap: 18px;
+}
+
+.note-card {
+  break-inside: avoid;
+  margin-bottom: 18px;
+  border-radius: var(--radius-md);
+  padding: 18px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-soft);
+  position: relative;
+  transition: transform 0.15s ease;
+}
+
+.note-card:hover {
+  transform: translateY(-3px);
+}
+
+.note-card.is-pinned {
+  border-color: var(--color-secondary);
+}
+
+.note-card .note-pin-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+}
+
+.note-card .note-pin-btn.pinned {
+  color: var(--color-secondary);
+}
+
+.note-card .note-title {
+  font-weight: 700;
+  margin-bottom: 6px;
+  padding-right: 24px;
+}
+
+.note-card .note-content {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  max-height: 140px;
+  overflow: hidden;
+}
+
+.note-card .note-content pre {
+  background: var(--color-bg);
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  overflow-x: auto;
+}
+
+.note-category-chip {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--color-bg);
+  color: var(--color-text-muted);
+  margin-top: 10px;
+}
+
+.note-editor {
+  min-height: 160px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  background: var(--color-surface);
+}
+
+.note-editor:focus {
+  outline: 2px solid var(--accent-color);
+}
+
+@media (max-width: 575.98px) {
+  .notes-grid {
+    columns: 1;
+  }
+}

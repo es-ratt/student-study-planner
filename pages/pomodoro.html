@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pomodoro Timer — Study Planner</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
+
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/dark-mode.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/pomodoro.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+  <div id="navbarRoot"></div>
+  <div id="sidebarRoot"></div>
+
+  <main id="pageContent" class="main-content">
+    <div class="page-header">
+      <h2>Pomodoro Timer</h2>
+    </div>
+
+    <div class="pomodoro-wrap">
+      <div class="mb-3">
+        <select id="pomodoroSubject" class="form-select">
+          <option value="">No subject</option>
+        </select>
+      </div>
+
+      <div class="timer-ring">
+        <svg viewBox="0 0 260 260">
+          <circle class="ring-bg" cx="130" cy="130" r="115"></circle>
+          <circle class="ring-progress" id="ringProgress" cx="130" cy="130" r="115"></circle>
+        </svg>
+        <div class="timer-display">
+          <span class="mode-label" id="timerModeLabel">Focus</span>
+          <span class="time" id="timerDisplay">25:00</span>
+        </div>
+      </div>
+
+      <div class="timer-controls">
+        <button class="btn btn-primary" id="startPauseBtn" aria-label="Start"><i class="fa-solid fa-play"></i></button>
+        <button class="btn btn-outline-secondary" id="resetBtn" aria-label="Reset"><i class="fa-solid fa-rotate-left"></i></button>
+      </div>
+
+      <div class="session-dots" id="sessionDots"></div>
+      <p class="text-muted-custom small mt-3" id="sessionCountText">0 sessions completed today</p>
+    </div>
+  </main>
+
+  <div id="fabRoot"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="../js/app.js"></script>
+  <script type="module">
+    import { getConfig, recordSession, getTodaySessionCount } from '../js/modules/pomodoroManager.js';
+    import { getAllSubjects } from '../js/modules/subjectManager.js';
+    import { requestNotificationPermission, showNotification } from '../js/modules/settingsManager.js';
+    import { showToast } from '../js/components/toast.js';
+
+    const config = getConfig();
+    const RADIUS = 115;
+    const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+
+    let mode = 'focus'; // 'focus' | 'break'
+    let secondsLeft = config.focusMinutes * 60;
+    let totalSeconds = secondsLeft;
+    let timerInterval = null;
+    let isRunning = false;
+
+    const ring = document.getElementById('ringProgress');
+    ring.style.strokeDasharray = `${CIRCUMFERENCE}`;
+    ring.style.strokeDashoffset = '0';
+
+    function updateDisplay() {
+      const minutes = Math.floor(secondsLeft / 60);
+      const seconds = secondsLeft % 60;
+      document.getElementById('timerDisplay').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      document.getElementById('timerModeLabel').textContent = mode === 'focus' ? 'Focus' : 'Break';
+
+      const progress = 1 - secondsLeft / totalSeconds;
+      ring.style.strokeDashoffset = `${CIRCUMFERENCE * (1 - progress)}`;
+    }
+
+    function renderSessionDots() {
+      const count = getTodaySessionCount();
+      const dotsWrap = document.getElementById('sessionDots');
+      dotsWrap.innerHTML = Array.from({ length: config.sessionsBeforeLongBreak }, (_, i) =>
+        `<span class="dot ${i < count % config.sessionsBeforeLongBreak ? 'filled' : ''}"></span>`
+      ).join('');
+      document.getElementById('sessionCountText').textContent = `${count} session${count === 1 ? '' : 's'} completed today`;
+    }
+
+    function tick() {
+      secondsLeft--;
+      if (secondsLeft < 0) {
+        completeSession();
+        return;
+      }
+      updateDisplay();
+    }
+
+    function completeSession() {
+      clearInterval(timerInterval);
+      isRunning = false;
+
+      const durationMinutes = mode === 'focus' ? config.focusMinutes : config.breakMinutes;
+      if (mode === 'focus') {
+        recordSession({ type: 'focus', durationMinutes, subjectId: document.getElementById('pomodoroSubject').value || null });
+      }
+
+      showNotification(mode === 'focus' ? 'Focus session complete!' : 'Break is over!', {
+        body: mode === 'focus' ? 'Time for a short break.' : 'Back to focus time.',
+      });
+      showToast(mode === 'focus' ? 'Focus session complete — take a break!' : 'Break over — back to it!', 'success');
+
+      mode = mode === 'focus' ? 'break' : 'focus';
+      secondsLeft = (mode === 'focus' ? config.focusMinutes : config.breakMinutes) * 60;
+      totalSeconds = secondsLeft;
+
+      updateDisplay();
+      renderSessionDots();
+      setStartButton(false);
+    }
+
+    function setStartButton(running) {
+      const btn = document.getElementById('startPauseBtn');
+      btn.innerHTML = running ? '<i class="fa-solid fa-pause"></i>' : '<i class="fa-solid fa-play"></i>';
+      btn.setAttribute('aria-label', running ? 'Pause' : 'Start');
+    }
+
+    function toggleTimer() {
+      if (isRunning) {
+        clearInterval(timerInterval);
+        isRunning = false;
+        setStartButton(false);
+        return;
+      }
+      isRunning = true;
+      setStartButton(true);
+      timerInterval = setInterval(tick, 1000);
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      isRunning = false;
+      mode = 'focus';
+      secondsLeft = config.focusMinutes * 60;
+      totalSeconds = secondsLeft;
+      updateDisplay();
+      setStartButton(false);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('pomodoroSubject').innerHTML = '<option value="">No subject</option>' +
+        getAllSubjects().map((s) => `<option value="${s.id}">${s.name}</option>`).join('');
+
+      updateDisplay();
+      renderSessionDots();
+      requestNotificationPermission();
+
+      document.getElementById('startPauseBtn').addEventListener('click', toggleTimer);
+      document.getElementById('resetBtn').addEventListener('click', resetTimer);
+    });
+  </script>
+</body>
+</html>

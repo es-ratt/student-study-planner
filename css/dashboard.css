@@ -1,0 +1,46 @@
+/* dashboard.css
+   Layout tweaks specific to dashboard.html. Shared widget/card styles
+   live in components.css — this file only fine-tunes the dashboard grid. */
+
+.dashboard-grid {
+  display: grid;
+  gap: 20px;
+}
+
+.welcome-banner {
+  border-radius: var(--radius-lg);
+  padding: 28px 32px;
+  background: linear-gradient(135deg, var(--color-primary) 0%, #a29bfe 100%);
+  color: #fff;
+  margin-bottom: 24px;
+}
+
+.welcome-banner h3 {
+  color: #fff;
+  font-weight: 700;
+}
+
+.streak-flame {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  color: var(--color-secondary);
+}
+
+.mini-calendar-list .mini-calendar-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--color-border);
+  font-size: 0.9rem;
+}
+
+.mini-calendar-list .mini-calendar-item:last-child {
+  border-bottom: none;
+}
+
+.quick-add-input {
+  border-radius: 999px;
+  padding: 10px 18px;
+}

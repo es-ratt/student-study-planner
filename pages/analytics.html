@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analytics — Study Planner</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
+
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/dark-mode.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/analytics.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+  <div id="navbarRoot"></div>
+  <div id="sidebarRoot"></div>
+
+  <main id="pageContent" class="main-content">
+    <div class="page-header">
+      <h2>Analytics</h2>
+    </div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-6 col-lg-3">
+        <div class="chart-card summary-stat">
+          <div class="value" id="sumProductivity">0%</div>
+          <div class="label">Productivity Score</div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="chart-card summary-stat">
+          <div class="value" id="sumStreak">0</div>
+          <div class="label">Day Streak</div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="chart-card summary-stat">
+          <div class="value" id="sumAvgDaily">0m</div>
+          <div class="label">Avg Daily Study Time</div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="chart-card summary-stat">
+          <div class="value" id="sumTotalWeek">0h</div>
+          <div class="label">Study Hours (7 days)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-lg-6">
+        <div class="chart-card">
+          <h6>Weekly Study Hours</h6>
+          <canvas id="weeklyChart"></canvas>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="chart-card">
+          <h6>Monthly Study Hours</h6>
+          <canvas id="monthlyChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-lg-4">
+        <div class="chart-card">
+          <h6>Subject-wise Study Time</h6>
+          <canvas id="subjectChart"></canvas>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="chart-card">
+          <h6>Completed vs Pending Tasks</h6>
+          <canvas id="completionChart"></canvas>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="chart-card">
+          <h6>Goal Achievement</h6>
+          <canvas id="goalChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="fabRoot"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+  <script type="module" src="../js/app.js"></script>
+  <script type="module">
+    import {
+      getWeeklyStudyHours, getMonthlyStudyHours, getSubjectWiseStudyTime,
+      getTaskCompletionStats, getProductivityScore, getStudyStreak, getAverageDailyStudyMinutes,
+    } from '../js/modules/analyticsManager.js';
+
+    const PALETTE = ['#6c5ce7', '#ff8a65', '#33b679', '#f4b942', '#e5566f', '#4361ee', '#00b8a9'];
+
+    function renderSummary() {
+      document.getElementById('sumProductivity').textContent = `${getProductivityScore()}%`;
+      document.getElementById('sumStreak').textContent = getStudyStreak();
+      document.getElementById('sumAvgDaily').textContent = `${getAverageDailyStudyMinutes()}m`;
+
+      const weekly = getWeeklyStudyHours();
+      const totalWeek = weekly.data.reduce((sum, h) => sum + h, 0);
+      document.getElementById('sumTotalWeek').textContent = `${totalWeek}h`;
+
+      new Chart(document.getElementById('weeklyChart'), {
+        type: 'bar',
+        data: { labels: weekly.labels, datasets: [{ label: 'Hours', data: weekly.data, backgroundColor: '#6c5ce7', borderRadius: 6 }] },
+        options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } },
+      });
+
+      const monthly = getMonthlyStudyHours();
+      new Chart(document.getElementById('monthlyChart'), {
+        type: 'line',
+        data: { labels: monthly.labels, datasets: [{ label: 'Hours', data: monthly.data, borderColor: '#ff8a65', backgroundColor: 'rgba(255,138,101,0.15)', fill: true, tension: 0.35 }] },
+        options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } },
+      });
+
+      const subjectData = getSubjectWiseStudyTime();
+      new Chart(document.getElementById('subjectChart'), {
+        type: 'doughnut',
+        data: { labels: subjectData.labels, datasets: [{ data: subjectData.data, backgroundColor: PALETTE }] },
+        options: { plugins: { legend: { position: 'bottom' } } },
+      });
+
+      const completion = getTaskCompletionStats();
+      new Chart(document.getElementById('completionChart'), {
+        type: 'pie',
+        data: { labels: ['Completed', 'Pending'], datasets: [{ data: [completion.completed, completion.pending], backgroundColor: ['#33b679', '#f4b942'] }] },
+        options: { plugins: { legend: { position: 'bottom' } } },
+      });
+
+      const productivity = getProductivityScore();
+      new Chart(document.getElementById('goalChart'), {
+        type: 'doughnut',
+        data: { labels: ['Achieved', 'Remaining'], datasets: [{ data: [productivity, 100 - productivity], backgroundColor: ['#6c5ce7', '#e4e1f0'] }] },
+        options: { cutout: '75%', plugins: { legend: { position: 'bottom' } } },
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', renderSummary);
+  </script>
+</body>
+</html>
