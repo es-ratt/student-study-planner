@@ -1,4 +1,10 @@
 import { openEditSubjectModal } from './renderModal.js';
+// renderCard.js
+// Responsible for turning a subject's data into an HTML card,
+// and rendering the full list of subject cards into the page.
+// Keeping rendering logic separate from data logic (subjectManager.js)
+// makes both easier to maintain independently.
+
 import { getAllSubjects, deleteSubject } from '../modules/subjectManager.js';
 import { showToast } from './toast.js';
 
