@@ -23,6 +23,7 @@ A web-based academic assistant that helps students manage courses, assignments, 
 ## Project Structure
 
 student-study-planner/
+
 ├── index.html          → redirects to pages/index.html (entry point for GitHub Pages)
 
 ├── pages/               → every screen of the app (login, dashboard, planner, etc.)
