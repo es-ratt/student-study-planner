@@ -24,11 +24,17 @@ A web-based academic assistant that helps students manage courses, assignments, 
 
 student-study-planner/
 ├── index.html          → redirects to pages/index.html (entry point for GitHub Pages)
+
 ├── pages/               → every screen of the app (login, dashboard, planner, etc.)
+
 ├── css/                 → one stylesheet per feature area
+
 ├── js/
+
 │   ├── modules/         → core logic (auth, tasks, subjects, exams, notes, analytics...)
+
 │   ├── components/      → reusable UI pieces (navbar, sidebar, toast, modal, fab)
+
 │   └── utils/            → shared helpers (dates, validation, id generation)
 
 ## How Data Flows
