@@ -84,18 +84,26 @@
       forgotModal.show();
     });
 
-    document.getElementById('loginForm').addEventListener('submit', (e) => {
+    const loginForm = document.getElementById('loginForm');
+    const loginBtn = loginForm.querySelector('button[type="submit"]');
+
+    loginForm.addEventListener('submit', (e) => {
       e.preventDefault();
+
+      if (loginBtn.disabled) return; // already submitting, ignore extra clicks
 
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
       const errorEl = document.getElementById('loginError');
       errorEl.textContent = '';
 
+      loginBtn.disabled = true;
+
       const result = loginUser({ email, password });
 
       if (!result.success) {
         errorEl.textContent = result.error;
+        loginBtn.disabled = false;
         return;
       }
 

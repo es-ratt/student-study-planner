@@ -67,8 +67,13 @@
 
     initTheme();
 
-    document.getElementById('registerForm').addEventListener('submit', (e) => {
+    const registerForm = document.getElementById('registerForm');
+    const registerBtn = registerForm.querySelector('button[type="submit"]');
+
+    registerForm.addEventListener('submit', (e) => {
       e.preventDefault();
+
+      if (registerBtn.disabled) return; // already submitting, ignore extra clicks
 
       const name = document.getElementById('name').value.trim();
       const email = document.getElementById('email').value.trim();
@@ -94,10 +99,13 @@
         return;
       }
 
+      registerBtn.disabled = true;
+
       const result = registerUser({ name, email, password });
 
       if (!result.success) {
         errorEl.textContent = result.error;
+        registerBtn.disabled = false;
         return;
       }
 
