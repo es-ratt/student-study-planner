@@ -1,86 +1,111 @@
 // authManager.js
-// Handles user registration, login, logout, and session state.
-// NOTE: this is localStorage-only auth (no real backend/hashing) —
-// fine for a student frontend project, NOT secure for production use.
+// Handles user registration, login, logout, and session state — now backed
+// by the real API (hashed passwords + JWT) instead of localStorage.
+//
+// registerUser/loginUser/updateProfile are now async (they make network
+// calls) — any page calling them needs `await`. getCurrentUser() and
+// isLoggedIn() stay SYNCHRONOUS on purpose: they read from an in-memory
+// cache that's populated once via `sessionReady`, so components like
+// navbar.js don't need to change at all.
 
-import { storage, KEYS } from './storage.js';
-import { generateId } from '../utils/idGenerator.js';
+import { apiRequest, setToken, clearToken, getToken } from './api.js';
 
-const SESSION_KEY = 'session'; // stores the currently logged-in user's id
+let currentUser = null; // in-memory cache, populated by sessionReady
+
+function mapUser(u) {
+  if (!u) return null;
+  return {
+    id: u.id,
+    name: u.name,
+    email: u.email,
+    university: u.university || '',
+    department: u.department || '',
+    semester: u.semester || '',
+    studyGoal: u.study_goal || u.studyGoal || '',
+  };
+}
+
+// ---------- INITIAL SESSION LOAD ----------
+// If a token is already saved (returning visitor), fetch the current user
+// so getCurrentUser() works synchronously right after this resolves.
+// app.js awaits this before guarding routes or rendering the navbar.
+async function loadSession() {
+  if (!getToken()) {
+    currentUser = null;
+    return null;
+  }
+
+  try {
+    const { user } = await apiRequest('/auth/me');
+    currentUser = mapUser(user);
+    return currentUser;
+  } catch (error) {
+    // Token expired/invalid — clear it so the user gets sent to login.
+    clearToken();
+    currentUser = null;
+    return null;
+  }
+}
+
+export const sessionReady = loadSession();
 
 // ---------- REGISTER ----------
 
-export function registerUser({ name, email, password }) {
-  const users = storage.get(KEYS.USER, []);
-
-  const existing = users.find((u) => u.email.toLowerCase() === email.toLowerCase());
-  if (existing) {
-    return { success: false, error: 'An account with this email already exists.' };
+export async function registerUser({ name, email, password }) {
+  try {
+    const { token, user } = await apiRequest('/auth/register', {
+      method: 'POST',
+      body: { name, email, password },
+    });
+    setToken(token);
+    currentUser = mapUser(user);
+    return { success: true, user: currentUser };
+  } catch (error) {
+    return { success: false, error: error.message };
   }
-
-  const newUser = {
-    id: generateId(),
-    name,
-    email,
-    password,
-    university: '',
-    department: '',
-    semester: '',
-    studyGoal: '',
-    createdAt: new Date().toISOString(),
-  };
-
-  users.push(newUser);
-  storage.set(KEYS.USER, users);
-
-  return { success: true, user: newUser };
 }
 
 // ---------- LOGIN ----------
 
-export function loginUser({ email, password }) {
-  const users = storage.get(KEYS.USER, []);
-  const user = users.find((u) => u.email.toLowerCase() === email.toLowerCase());
-
-  if (!user || user.password !== password) {
-    return { success: false, error: 'Incorrect email or password.' };
+export async function loginUser({ email, password }) {
+  try {
+    const { token, user } = await apiRequest('/auth/login', {
+      method: 'POST',
+      body: { email, password },
+    });
+    setToken(token);
+    currentUser = mapUser(user);
+    return { success: true, user: currentUser };
+  } catch (error) {
+    return { success: false, error: error.message };
   }
-
-  storage.set(SESSION_KEY, { userId: user.id });
-  return { success: true, user };
 }
 
 // ---------- LOGOUT ----------
 
 export function logoutUser() {
-  storage.remove(SESSION_KEY);
+  clearToken();
+  currentUser = null;
 }
 
-// ---------- SESSION ----------
+// ---------- SESSION (synchronous — reads the in-memory cache) ----------
 
 export function getCurrentUser() {
-  const session = storage.get(SESSION_KEY, null);
-  if (!session) return null;
-
-  const users = storage.get(KEYS.USER, []);
-  return users.find((u) => u.id === session.userId) || null;
+  return currentUser;
 }
 
 export function isLoggedIn() {
-  return getCurrentUser() !== null;
+  return currentUser !== null;
 }
 
 // ---------- PROFILE ----------
 
-export function updateProfile(updates) {
-  const currentUser = getCurrentUser();
-  if (!currentUser) return { success: false, error: 'Not logged in.' };
-
-  const users = storage.get(KEYS.USER, []);
-  const updatedUsers = users.map((u) =>
-    u.id === currentUser.id ? { ...u, ...updates } : u
-  );
-
-  storage.set(KEYS.USER, updatedUsers);
-  return { success: true, user: updatedUsers.find((u) => u.id === currentUser.id) };
+export async function updateProfile(updates) {
+  try {
+    const { user } = await apiRequest('/auth/me', { method: 'PUT', body: updates });
+    currentUser = mapUser(user);
+    return { success: true, user: currentUser };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
 }

@@ -59,6 +59,7 @@
     </div>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
   <script type="module">
     import { initTheme } from '../js/modules/themeManager.js';
     import { registerUser } from '../js/modules/authManager.js';
@@ -70,7 +71,7 @@
     const registerForm = document.getElementById('registerForm');
     const registerBtn = registerForm.querySelector('button[type="submit"]');
 
-    registerForm.addEventListener('submit', (e) => {
+    registerForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       if (registerBtn.disabled) return; // already submitting, ignore extra clicks
@@ -101,7 +102,7 @@
 
       registerBtn.disabled = true;
 
-      const result = registerUser({ name, email, password });
+      const result = await registerUser({ name, email, password });
 
       if (!result.success) {
         errorEl.textContent = result.error;
@@ -109,8 +110,8 @@
         return;
       }
 
-      showToast(`Account created — welcome, ${result.user.name}!`, 'success');
-      setTimeout(() => { window.location.href = 'login.html'; }, 800);
+      showToast(`Account created — please log in, ${result.user.name}!`, 'success');
+      setTimeout(() => { window.location.href = 'login.html'; }, 1500);
     });
   </script>
 </body>

@@ -148,6 +148,7 @@
     import { getWeeklyStudyHours, getProductivityScore, getStudyStreak } from '../js/modules/analyticsManager.js';
     import { formatCountdown, formatDate } from '../js/utils/dateHelpers.js';
     import { showToast } from '../js/components/toast.js';
+    import { appReady } from '../js/app.js';
 
     const QUOTES = [
       "Small steps every day lead to big results.",
@@ -275,7 +276,8 @@
       });
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
+      await appReady;
       initWelcome();
       renderTaskList('dashTodayTasks', getTodayTasks(), 'No tasks for today 🎉');
       renderAssignments();

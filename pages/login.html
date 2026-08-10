@@ -87,7 +87,7 @@
     const loginForm = document.getElementById('loginForm');
     const loginBtn = loginForm.querySelector('button[type="submit"]');
 
-    loginForm.addEventListener('submit', (e) => {
+    loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       if (loginBtn.disabled) return; // already submitting, ignore extra clicks
@@ -99,7 +99,7 @@
 
       loginBtn.disabled = true;
 
-      const result = loginUser({ email, password });
+      const result = await loginUser({ email, password });
 
       if (!result.success) {
         errorEl.textContent = result.error;

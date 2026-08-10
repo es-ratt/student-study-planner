@@ -116,6 +116,7 @@
     import { getAllSubjects, getSubjectById } from '../js/modules/subjectManager.js';
     import { formatCountdown } from '../js/utils/dateHelpers.js';
     import { showToast } from '../js/components/toast.js';
+    import { appReady } from '../js/app.js';
 
     const taskModal = new bootstrap.Modal(document.getElementById('taskModal'));
 
@@ -240,7 +241,8 @@
       renderTaskList();
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
+      await appReady;
       populateSubjectOptions();
       renderTaskList();
 
