@@ -10,6 +10,7 @@ js/modules/api.js          ← NEW file
 js/modules/storage.js      ← REPLACES the old one
 js/modules/authManager.js  ← REPLACES the old one
 js/app.js                  ← REPLACES the old one
+css/dark-mode.css          ← REPLACES the old one (fixes white areas after login)
 pages/login.html           ← REPLACES the old one
 pages/register.html        ← REPLACES the old one
 pages/profile.html         ← REPLACES the old one
