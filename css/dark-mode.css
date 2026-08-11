@@ -73,3 +73,108 @@
   background-color: var(--color-surface);
   color: var(--color-text);
 }
+
+/* ---------- Post-login pages ---------- */
+/* The overrides above were written for the landing/auth pages only.
+   Everything below covers Bootstrap components used on dashboard,
+   planner, subjects, assignments, exams, notes, calendar, analytics,
+   pomodoro, profile, and settings — which were staying white because
+   Bootstrap's defaults don't know about our theme variables. */
+
+[data-theme="dark"] .modal-content {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .modal-header,
+[data-theme="dark"] .modal-footer {
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+[data-theme="dark"] .form-select {
+  background-color: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+[data-theme="dark"] .form-select:focus {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+}
+
+[data-theme="dark"] .form-label,
+[data-theme="dark"] .form-text {
+  color: var(--color-text-muted);
+}
+
+[data-theme="dark"] .list-group-item {
+  background-color: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+[data-theme="dark"] .table {
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .table > :not(caption) > * > * {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  border-bottom-color: var(--color-border);
+  box-shadow: none;
+}
+
+[data-theme="dark"] .table-hover > tbody > tr:hover > * {
+  background-color: var(--color-bg);
+}
+
+[data-theme="dark"] .nav-tabs {
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .nav-tabs .nav-link {
+  color: var(--color-text-muted);
+}
+
+[data-theme="dark"] .nav-tabs .nav-link.active {
+  background-color: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+[data-theme="dark"] .offcanvas {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+}
+
+[data-theme="dark"] .toast {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .bg-white,
+[data-theme="dark"] .bg-light {
+  background-color: var(--color-surface) !important;
+  color: var(--color-text) !important;
+}
+
+[data-theme="dark"] .text-dark {
+  color: var(--color-text) !important;
+}
+
+[data-theme="dark"] .btn-outline-secondary {
+  border-color: var(--color-border);
+  color: var(--color-text-muted);
+}
+
+[data-theme="dark"] .btn-outline-secondary:hover {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
