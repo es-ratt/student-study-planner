@@ -1,3 +1,13 @@
+<!--
+  dashboard.html — Main landing page after login
+
+  This is the home screen a user sees right after logging in. It pulls
+  a small preview from every other module (tasks, assignments, exams,
+  notes, calendar, analytics) and shows it as widget cards, so the user
+  gets a full picture of their day/week without opening five pages.
+  All the widget-rendering logic lives in the inline script at the
+  bottom — each widget has its own small render function.
+-->
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
@@ -17,16 +27,20 @@
   <link rel="stylesheet" href="../css/responsive.css">
 </head>
 <body>
+  <!-- These two are empty containers — app.js fills them in with the
+       navbar/sidebar HTML once it confirms the user is logged in -->
   <div id="navbarRoot"></div>
   <div id="sidebarRoot"></div>
 
   <main id="pageContent" class="main-content">
 
+    <!-- Greeting banner — text gets set dynamically by initWelcome() below -->
     <div class="welcome-banner">
       <h3 id="welcomeMessage">Welcome back!</h3>
       <p class="mb-0" id="welcomeSubtext">Here's what's on your plate today.</p>
     </div>
 
+    <!-- Four small stat cards across the top: today's tasks, study hours, exams, streak -->
     <div class="row g-3 mb-3">
       <div class="col-6 col-lg-3">
         <div class="stat-card">
@@ -58,6 +72,7 @@
       </div>
     </div>
 
+    <!-- Today's tasks + upcoming assignments, side by side -->
     <div class="row g-3 mb-3">
       <div class="col-lg-6">
         <div class="widget-card">
@@ -73,6 +88,7 @@
       </div>
     </div>
 
+    <!-- Exams, notes, and a mini weekly calendar — three columns -->
     <div class="row g-3 mb-3">
       <div class="col-lg-4">
         <div class="widget-card">
@@ -94,10 +110,12 @@
       </div>
     </div>
 
+    <!-- Weekly study-hours chart + two small progress cards -->
     <div class="row g-3 mb-3">
       <div class="col-lg-6">
         <div class="widget-card">
           <div class="widget-title"><span>Weekly Study Hours</span></div>
+          <!-- Chart.js draws into this canvas — see renderStats() below -->
           <canvas id="dashWeeklyChart" height="160"></canvas>
         </div>
       </div>
@@ -119,10 +137,12 @@
       </div>
     </div>
 
+    <!-- Random motivational quote, picked fresh on every page load -->
     <div class="quote-banner mb-3">
       <i class="fa-solid fa-quote-left me-2"></i><span id="motivationalQuote">Small steps every day lead to big results.</span>
     </div>
 
+    <!-- Fast way to add a task without leaving the dashboard -->
     <div class="widget-card">
       <div class="widget-title">Quick Add Task</div>
       <form id="quickAddForm" class="d-flex gap-2 flex-wrap">
@@ -133,10 +153,14 @@
 
   </main>
 
+  <!-- Floating action button (bottom-right "+" button), also filled in by app.js -->
   <div id="fabRoot"></div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+  <!-- Chart.js — draws the weekly study-hours bar chart -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+  <!-- app.js runs on every logged-in page: checks the session, loads data
+       from the backend, and builds the navbar/sidebar/fab -->
   <script type="module" src="../js/app.js"></script>
   <script type="module">
     import { getCurrentUser } from '../js/modules/authManager.js';
@@ -148,8 +172,12 @@
     import { getWeeklyStudyHours, getProductivityScore, getStudyStreak } from '../js/modules/analyticsManager.js';
     import { formatCountdown, formatDate } from '../js/utils/dateHelpers.js';
     import { showToast } from '../js/components/toast.js';
+    // appReady resolves once app.js has confirmed the session AND loaded
+    // all the user's data from the backend — we wait for it before
+    // rendering anything, otherwise widgets would flash "empty" first
     import { appReady } from '../js/app.js';
 
+    // Rotates on every load so the dashboard doesn't feel static
     const QUOTES = [
       "Small steps every day lead to big results.",
       "Discipline is choosing what you want most over what you want now.",
@@ -158,12 +186,16 @@
       "Consistency beats intensity.",
     ];
 
+    // Sets the greeting text using the logged-in user's first name,
+    // and picks one random quote to display
     function initWelcome() {
       const user = getCurrentUser();
       document.getElementById('welcomeMessage').textContent = user ? `Welcome back, ${user.name.split(' ')[0]}!` : 'Welcome back!';
       document.getElementById('motivationalQuote').textContent = QUOTES[Math.floor(Math.random() * QUOTES.length)];
     }
 
+    // Shared renderer for any list of tasks — used for the "Today's Tasks" widget.
+    // Only shows the first 5 items so the widget doesn't grow too tall.
     function renderTaskList(containerId, tasks, emptyText) {
       const container = document.getElementById(containerId);
       if (tasks.length === 0) {
@@ -171,6 +203,7 @@
         return;
       }
       container.innerHTML = tasks.slice(0, 5).map((t) => {
+        // Look up the subject's color dot, if this task is linked to one
         const subject = t.subjectId ? getSubjectById(t.subjectId) : null;
         return `
           <div class="list-row ${t.completed ? 'is-completed' : ''}">
@@ -181,6 +214,7 @@
       }).join('');
     }
 
+    // Fills the "Upcoming Assignments" widget
     function renderAssignments() {
       const list = getUpcomingAssignments();
       const container = document.getElementById('dashUpcomingAssignments');
@@ -195,6 +229,7 @@
         </div>`).join('');
     }
 
+    // Fills the "Upcoming Exams" widget
     function renderExams() {
       const list = getUpcomingExams();
       const container = document.getElementById('dashUpcomingExams');
@@ -209,6 +244,7 @@
         </div>`).join('');
     }
 
+    // Fills the "Recent Notes" widget — shows the 3 most recently updated notes
     function renderNotesWidget() {
       const notes = getRecentNotes(3);
       const container = document.getElementById('dashRecentNotes');
@@ -223,6 +259,8 @@
         </div>`).join('');
     }
 
+    // Fills the "This Week" mini-calendar widget — combines tasks and
+    // exams due in the next 7 days into one merged, sorted-ish list
     function renderMiniCalendar() {
       const upcoming = [...getUpcomingTasks(7), ...getUpcomingExams(7)];
       const container = document.getElementById('dashMiniCalendar');
@@ -235,6 +273,8 @@
       `).join('');
     }
 
+    // Fills the 4 stat cards, the progress bar, and draws the Chart.js bar chart.
+    // Called once on load and again after the quick-add form is used.
     function renderStats() {
       document.getElementById('statTodayTasks').textContent = getTodayTasks().length;
       document.getElementById('statUpcomingExams').textContent = getUpcomingExams().length;
@@ -242,9 +282,11 @@
       document.getElementById('productivityScore').textContent = `${getProductivityScore()}%`;
 
       const weekly = getWeeklyStudyHours();
+      // last entry in the week's data array is always "today"
       const todayHours = weekly.data[weekly.data.length - 1] || 0;
       document.getElementById('statStudyHours').textContent = `${todayHours}h`;
 
+      // Weekly goal is a fixed 20 hours for now — could become a user setting later
       const weeklyGoalHours = 20;
       const totalWeekHours = weekly.data.reduce((sum, h) => sum + h, 0);
       const pct = Math.min(100, Math.round((totalWeekHours / weeklyGoalHours) * 100));
@@ -261,22 +303,28 @@
       });
     }
 
+    // Handles the "Quick Add Task" form at the bottom of the page
     function initQuickAdd() {
       document.getElementById('quickAddForm').addEventListener('submit', (e) => {
         e.preventDefault();
         const input = document.getElementById('quickAddInput');
         const title = input.value.trim();
-        if (!title) return;
+        if (!title) return; // ignore empty submits
 
+        // Quick-add always defaults to medium priority and today's date —
+        // for anything more specific, the user goes to the full Planner page
         addTask({ title, priority: 'medium', deadline: new Date().toISOString().split('T')[0] });
-        input.value = '';
+        input.value = ''; // clear the input for the next task
         showToast('Task added', 'success');
+        // re-render the affected widgets so the new task shows up immediately
         renderTaskList('dashTodayTasks', getTodayTasks(), 'No tasks for today 🎉');
         renderStats();
       });
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
+      // Wait for session + data to be ready before touching any widget —
+      // without this, the page would briefly show "empty" states on every load
       await appReady;
       initWelcome();
       renderTaskList('dashTodayTasks', getTodayTasks(), 'No tasks for today 🎉');
