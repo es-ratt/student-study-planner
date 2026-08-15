@@ -6,6 +6,7 @@
 import { initTheme } from './modules/themeManager.js';
 import { isLoggedIn, sessionReady } from './modules/authManager.js';
 import { storageReady } from './modules/storage.js';
+import { initReminders } from './modules/reminderManager.js';
 import { renderNavbar } from './components/navbar.js';
 import { renderSidebar } from './components/sidebar.js';
 import { renderFab } from './components/fab.js';
@@ -40,6 +41,7 @@ async function boot() {
   renderNavbar();
   renderSidebar();
   renderFab();
+  initReminders();
 }
 
 document.addEventListener('DOMContentLoaded', boot);
