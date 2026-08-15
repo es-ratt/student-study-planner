@@ -5,13 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Study Planner — Get your semester together</title>
 
+  <!-- Google Fonts (Sora for headings, Inter for body text) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
+  <!-- Icon library, Bootstrap framework, and AOS (scroll animation library) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.1/aos.css">
 
+  <!-- Our own stylesheets -->
   <link rel="stylesheet" href="../css/base.css">
   <link rel="stylesheet" href="../css/dark-mode.css">
   <link rel="stylesheet" href="../css/landing.css">
@@ -19,11 +22,13 @@
 </head>
 <body>
 
+  <!-- ===== Top navigation bar ===== -->
   <nav class="navbar navbar-expand-lg glass-surface fixed-top px-3 py-2">
     <div class="container">
       <a class="navbar-brand fw-bold" href="index.html">
         <i class="fa-solid fa-graduation-cap me-2" style="color: var(--color-primary);"></i>Study Planner
       </a>
+      <!-- Hamburger button, shows on small screens -->
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#landingNav">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -41,9 +46,11 @@
     </div>
   </nav>
 
+  <!-- ===== Hero section — first thing visitors see ===== -->
   <header class="hero">
     <div class="container">
       <div class="row align-items-center g-5" style="padding-top: 56px;">
+        <!-- Left side: headline + call-to-action buttons -->
         <div class="col-lg-6" data-aos="fade-right">
           <span class="badge rounded-pill bg-light text-dark mb-3 px-3 py-2">
             <i class="fa-solid fa-star me-1"></i> Built for students, by students
@@ -63,6 +70,7 @@
           </div>
         </div>
 
+        <!-- Right side: fake "preview card" showing what the dashboard looks like -->
         <div class="col-lg-6" data-aos="fade-left">
           <div class="hero-mock-card">
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -87,6 +95,7 @@
     </div>
   </header>
 
+  <!-- ===== Features section — 6 feature cards in a grid ===== -->
   <section id="features" class="section-padding">
     <div class="container">
       <div class="text-center mb-5" data-aos="fade-up">
@@ -95,6 +104,7 @@
       </div>
 
       <div class="row g-4">
+        <!-- Each of these 6 blocks is one feature card: icon + title + description -->
         <div class="col-md-4" data-aos="fade-up" data-aos-delay="0">
           <div class="feature-card">
             <div class="feature-icon"><i class="fa-solid fa-list-check"></i></div>
@@ -141,6 +151,7 @@
     </div>
   </section>
 
+  <!-- ===== "How it works" — 3-step explainer ===== -->
   <section id="how-it-works" class="section-padding" style="background: var(--color-surface);">
     <div class="container">
       <div class="text-center mb-5" data-aos="fade-up">
@@ -178,6 +189,7 @@
     </div>
   </section>
 
+  <!-- ===== Testimonials — 3 fake student quotes for social proof ===== -->
   <section class="section-padding">
     <div class="container">
       <div class="text-center mb-5" data-aos="fade-up">
@@ -215,6 +227,7 @@
     </div>
   </section>
 
+  <!-- ===== FAQ — Bootstrap accordion (click a question, answer expands) ===== -->
   <section id="faq" class="section-padding" style="background: var(--color-surface);">
     <div class="container" style="max-width: 760px;">
       <div class="text-center mb-5" data-aos="fade-up">
@@ -255,6 +268,7 @@
     </div>
   </section>
 
+  <!-- ===== Final call-to-action band before the footer ===== -->
   <section class="section-padding">
     <div class="container">
       <div class="cta-band" data-aos="zoom-in">
@@ -265,6 +279,7 @@
     </div>
   </section>
 
+  <!-- ===== Footer ===== -->
   <footer class="landing-footer">
     <div class="container d-flex flex-wrap justify-content-between align-items-center gap-3">
       <span class="fw-bold"><i class="fa-solid fa-graduation-cap me-2" style="color: var(--color-primary);"></i>Study Planner</span>
@@ -277,7 +292,9 @@
     </div>
   </footer>
 
+  <!-- Bootstrap JS (needed for the navbar toggle + accordion to work) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+  <!-- AOS = "Animate On Scroll" — makes sections fade/slide in as you scroll down -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.1/aos.js"></script>
   <script>AOS.init({ duration: 700, once: true });</script>
 </body>
