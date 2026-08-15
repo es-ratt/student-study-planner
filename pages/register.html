@@ -26,6 +26,7 @@
 
       <h5 class="text-center mb-3">Create your account</h5>
 
+      <!-- novalidate: we do our own validation in JS below instead of the browser's default -->
       <form id="registerForm" novalidate>
         <div class="mb-3">
           <label class="form-label" for="name">Full name</label>
@@ -48,6 +49,7 @@
           <input type="password" class="form-control" id="confirmPassword" required autocomplete="new-password" />
         </div>
 
+        <!-- Filled in by JS if validation fails or the server rejects the signup -->
         <div id="registerError" class="auth-error"></div>
 
         <button type="submit" class="btn btn-primary">Create account</button>
@@ -72,17 +74,19 @@
     const registerBtn = registerForm.querySelector('button[type="submit"]');
 
     registerForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
+      e.preventDefault(); // stop the default page-reload form submission
 
       if (registerBtn.disabled) return; // already submitting, ignore extra clicks
 
+      // Read all the field values in one place
       const name = document.getElementById('name').value.trim();
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
       const confirmPassword = document.getElementById('confirmPassword').value;
       const errorEl = document.getElementById('registerError');
-      errorEl.textContent = '';
+      errorEl.textContent = ''; // clear any old error before re-checking
 
+      // ---- Client-side validation, checked in order, stop at the first problem ----
       if (!isRequired(name)) {
         errorEl.textContent = 'Name is required.';
         return;
@@ -100,17 +104,20 @@
         return;
       }
 
-      registerBtn.disabled = true;
+      registerBtn.disabled = true; // block double-submits while waiting on the server
 
+      // registerUser() sends the data to the backend and returns { success, user } or { success:false, error }
       const result = await registerUser({ name, email, password });
 
       if (!result.success) {
+        // e.g. "email already registered" — comes straight from the backend's error message
         errorEl.textContent = result.error;
-        registerBtn.disabled = false;
+        registerBtn.disabled = false; // let them fix it and try again
         return;
       }
 
       showToast(`Account created — please log in, ${result.user.name}!`, 'success');
+      // wait so the toast is visible before navigating to the login page
       setTimeout(() => { window.location.href = 'login.html'; }, 1500);
     });
   </script>
