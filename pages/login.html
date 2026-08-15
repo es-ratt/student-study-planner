@@ -17,6 +17,7 @@
 </head>
 <body>
 
+  <!-- ===== Centered login card ===== -->
   <div class="auth-page">
     <div class="auth-card">
       <div class="auth-brand">
@@ -26,6 +27,7 @@
 
       <h5 class="text-center mb-3">Welcome back</h5>
 
+      <!-- novalidate = we handle validation ourselves in JS, not the browser's default popups -->
       <form id="loginForm" novalidate>
         <div class="mb-3">
           <label class="form-label" for="email">Email</label>
@@ -41,6 +43,7 @@
           <a href="#" id="forgotPasswordLink" class="small">Forgot password?</a>
         </div>
 
+        <!-- Error message gets filled in here by JS if login fails -->
         <div id="loginError" class="auth-error"></div>
 
         <button type="submit" class="btn btn-primary">Log in</button>
@@ -52,6 +55,7 @@
     </div>
   </div>
 
+  <!-- ===== "Forgot password" popup modal (UI only — no backend behind this yet) ===== -->
   <div class="modal fade" id="forgotPasswordModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
@@ -70,14 +74,18 @@
     </div>
   </div>
 
+  <!-- Needed for the modal popup to work -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+
   <script type="module">
     import { initTheme } from '../js/modules/themeManager.js';
     import { loginUser } from '../js/modules/authManager.js';
     import { showToast } from '../js/components/toast.js';
 
+    // Apply saved light/dark theme as soon as the page loads
     initTheme();
 
+    // Wire up the "Forgot password?" link to open the modal
     const forgotModal = new bootstrap.Modal(document.getElementById('forgotPasswordModal'));
     document.getElementById('forgotPasswordLink').addEventListener('click', (e) => {
       e.preventDefault();
@@ -88,26 +96,28 @@
     const loginBtn = loginForm.querySelector('button[type="submit"]');
 
     loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
+      e.preventDefault(); // stop the browser's default page-reload form submit
 
       if (loginBtn.disabled) return; // already submitting, ignore extra clicks
 
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
       const errorEl = document.getElementById('loginError');
-      errorEl.textContent = '';
+      errorEl.textContent = ''; // clear any previous error message
 
-      loginBtn.disabled = true;
+      loginBtn.disabled = true; // prevent double-submitting while we wait for the server
 
+      // loginUser() talks to the backend API and returns { success, user } or { success:false, error }
       const result = await loginUser({ email, password });
 
       if (!result.success) {
         errorEl.textContent = result.error;
-        loginBtn.disabled = false;
+        loginBtn.disabled = false; // let them try again
         return;
       }
 
       showToast(`Welcome back, ${result.user.name}!`, 'success');
+      // small delay so the toast is visible before we navigate away
       setTimeout(() => { window.location.href = 'dashboard.html'; }, 600);
     });
   </script>
