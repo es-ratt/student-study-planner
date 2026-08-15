@@ -1,5 +1,9 @@
 # Student Study Planner
 
+**Live Site:** [es-ratt.github.io/student-study-planner](https://es-ratt.github.io/student-study-planner)
+
+> Note: the live site is the frontend only. Login, data, and reminders require the backend to be running — either on your own machine (see [Running It Locally](#running-it-locally)) or on a deployed server. A browser link cannot start a program on your computer for you (this is a security restriction in every browser, not a limitation specific to this project), so `start.bat` has to be run manually the first time; it is not something a link can trigger.
+
 A full-stack academic assistant that helps students manage courses, assignments, study schedules, and exam deadlines in one place. The project started as a static, localStorage-only frontend and has since been extended with a real backend (Node.js, Express, MySQL) and a client-side reminder system for exams and high-priority tasks.
 
 ## Table of Contents
