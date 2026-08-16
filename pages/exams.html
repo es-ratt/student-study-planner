@@ -1,3 +1,13 @@
+<!--
+  exams.html — Manage exams
+
+  Shows each exam as a card (not a list row, like tasks/assignments) —
+  cards give more room for the date/time/room details and the
+  preparation-percentage slider. That slider is the standout feature
+  here: dragging it calls setPrepPercentage() immediately, no separate
+  save button, since "how ready am I" is the kind of thing you want to
+  update in passing, not through a modal.
+-->
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
@@ -91,10 +101,13 @@
         getAllSubjects().map((s) => `<option value="${s.id}">${s.name}</option>`).join('');
     }
 
+    // Maps each possible exam status to a badge color class.
+    // "today" and "unknown" both fall back sensibly instead of erroring.
     const STATUS_CLASS = { today: 'status-overdue', upcoming: 'status-pending', scheduled: 'status-pending', completed: 'status-completed', unknown: 'status-pending' };
 
     function renderExamList() {
       const container = document.getElementById('examList');
+      // Sort soonest-first so the exam you need to worry about most is always at the top
       const exams = [...getAllExams()].sort((a, b) => new Date(a.date) - new Date(b.date));
 
       if (exams.length === 0) {
@@ -107,6 +120,8 @@
         const status = getExamStatus(exam);
         return `
           <div class="col-md-6 col-lg-4 mb-4" data-id="${exam.id}">
+            <!-- Left border color matches the subject's color, so exams for the
+                 same course are visually grouped even without being sorted together -->
             <div class="card h-100 shadow-sm border-0" style="border-left: 5px solid ${subject ? subject.color : 'var(--accent-color)'};">
               <div class="card-body">
                 <div class="d-flex justify-content-between align-items-start mb-2">
@@ -118,6 +133,7 @@
                   <div><i class="fa-solid fa-calendar-days me-1"></i>${formatDate(exam.date)} ${exam.time ? '· ' + formatTime(exam.time) : ''}</div>
                   ${exam.room ? `<div><i class="fa-solid fa-location-dot me-1"></i>${exam.room}</div>` : ''}
                 </div>
+                <!-- Preparation slider: dragging this saves immediately (see attachExamEvents) -->
                 <label class="small text-muted-custom">Preparation: ${exam.prepPercentage}%</label>
                 <input type="range" class="form-range prep-range" min="0" max="100" value="${exam.prepPercentage}" />
                 <div class="d-flex gap-2 mt-2">
@@ -133,6 +149,8 @@
     }
 
     function attachExamEvents() {
+      // "change" (not "input") fires once the user releases the slider,
+      // not on every pixel of drag — avoids spamming saves mid-drag
       document.querySelectorAll('.prep-range').forEach((range) => {
         range.addEventListener('change', (e) => {
           const id = e.target.closest('[data-id]').dataset.id;
