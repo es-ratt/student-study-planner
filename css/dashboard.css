@@ -1,12 +1,19 @@
-/* dashboard.css
-   Layout tweaks specific to dashboard.html. Shared widget/card styles
-   live in components.css — this file only fine-tunes the dashboard grid. */
+/*
+  dashboard.css — Dashboard-only layout tweaks
+
+  Deliberately small. Everything reusable (cards, badges, list rows)
+  already lives in components.css — this file only holds the handful
+  of styles that are truly unique to dashboard.html, like the gradient
+  welcome banner and the mini-calendar list rows.
+*/
 
 .dashboard-grid {
   display: grid;
   gap: 20px;
 }
 
+/* Gradient banner at the top of the dashboard — the only place in the
+   app with a diagonal gradient background like this */
 .welcome-banner {
   border-radius: var(--radius-lg);
   padding: 28px 32px;
@@ -16,7 +23,7 @@
 }
 
 .welcome-banner h3 {
-  color: #fff;
+  color: #fff; /* stays white even in dark mode — sits directly on the gradient, not the page background */
   font-weight: 700;
 }
 
@@ -28,6 +35,8 @@
   color: var(--color-secondary);
 }
 
+/* Rows inside the "This Week" mini-calendar widget — dashed divider
+   instead of a solid one to feel lighter/less like a full data table */
 .mini-calendar-list .mini-calendar-item {
   display: flex;
   justify-content: space-between;
