@@ -1,3 +1,12 @@
+<!--
+  analytics.html — Study statistics dashboard
+
+  Six Chart.js charts fed by analyticsManager.js, which does all the
+  actual math (streaks, averages, per-subject time, completion rates)
+  by reading through tasks/assignments/pomodoro sessions. This page's
+  own job is purely presentational: call one function per chart, hand
+  the result straight to Chart.js. No calculation logic lives here.
+-->
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
@@ -25,6 +34,7 @@
       <h2>Analytics</h2>
     </div>
 
+    <!-- Four quick-glance number cards across the top -->
     <div class="row g-3 mb-3">
       <div class="col-6 col-lg-3">
         <div class="chart-card summary-stat">
@@ -52,6 +62,7 @@
       </div>
     </div>
 
+    <!-- Weekly bar chart + monthly line chart, side by side -->
     <div class="row g-3 mb-3">
       <div class="col-lg-6">
         <div class="chart-card">
@@ -67,6 +78,7 @@
       </div>
     </div>
 
+    <!-- Three smaller charts: per-subject breakdown, task completion, goal progress -->
     <div class="row g-3">
       <div class="col-lg-4">
         <div class="chart-card">
@@ -100,8 +112,12 @@
       getTaskCompletionStats, getProductivityScore, getStudyStreak, getAverageDailyStudyMinutes,
     } from '../js/modules/analyticsManager.js';
 
+    // One shared color palette so every chart on this page feels consistent,
+    // instead of each chart picking its own random colors
     const PALETTE = ['#6c5ce7', '#ff8a65', '#33b679', '#f4b942', '#e5566f', '#4361ee', '#00b8a9'];
 
+    // Builds all 4 stat cards and all 5 charts in one pass, since every
+    // chart on this page is independent — no shared state between them
     function renderSummary() {
       document.getElementById('sumProductivity').textContent = `${getProductivityScore()}%`;
       document.getElementById('sumStreak').textContent = getStudyStreak();
@@ -111,12 +127,14 @@
       const totalWeek = weekly.data.reduce((sum, h) => sum + h, 0);
       document.getElementById('sumTotalWeek').textContent = `${totalWeek}h`;
 
+      // Bar chart: hours studied per day, this week
       new Chart(document.getElementById('weeklyChart'), {
         type: 'bar',
         data: { labels: weekly.labels, datasets: [{ label: 'Hours', data: weekly.data, backgroundColor: '#6c5ce7', borderRadius: 6 }] },
         options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } },
       });
 
+      // Line chart (with fill under the line) shows the longer-term trend better than bars would
       const monthly = getMonthlyStudyHours();
       new Chart(document.getElementById('monthlyChart'), {
         type: 'line',
@@ -124,6 +142,7 @@
         options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } },
       });
 
+      // Doughnut: how study time splits across subjects
       const subjectData = getSubjectWiseStudyTime();
       new Chart(document.getElementById('subjectChart'), {
         type: 'doughnut',
@@ -131,6 +150,7 @@
         options: { plugins: { legend: { position: 'bottom' } } },
       });
 
+      // Pie: completed vs still-pending tasks, at a glance
       const completion = getTaskCompletionStats();
       new Chart(document.getElementById('completionChart'), {
         type: 'pie',
@@ -138,6 +158,7 @@
         options: { plugins: { legend: { position: 'bottom' } } },
       });
 
+      // Thick-cutout doughnut used as a simple "progress ring" for the weekly goal
       const productivity = getProductivityScore();
       new Chart(document.getElementById('goalChart'), {
         type: 'doughnut',
