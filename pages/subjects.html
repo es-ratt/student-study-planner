@@ -1,3 +1,13 @@
+<!--
+  subjects.html — Manage subjects/courses
+
+  Lists every subject the user has added as a grid of cards (color,
+  teacher, credit hours, etc.), with an "Add Subject" button that opens
+  a modal. This page is intentionally thin — almost all the real logic
+  (building the cards, building the modal) lives in shared component
+  files (renderCard.js, renderModal.js) so the same card/modal code
+  can be reused if another page ever needs to show subjects too.
+-->
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
@@ -25,6 +35,7 @@
       <button class="btn btn-primary rounded-pill px-4" id="addSubjectBtn"><i class="fa-solid fa-plus me-1"></i>Add Subject</button>
     </div>
 
+    <!-- renderSubjects() below fills this with one card per subject -->
     <div class="row" id="subjectsList"></div>
   </main>
 
@@ -37,6 +48,9 @@
     import { injectSubjectModal, openAddSubjectModal } from '../js/components/renderModal.js';
 
     document.addEventListener('DOMContentLoaded', () => {
+      // injectSubjectModal() builds the add/edit modal HTML and drops it
+      // into the page — kept out of this file so subjects.html itself
+      // stays focused on layout, not modal markup
       injectSubjectModal();
       renderSubjects('subjectsList');
 
