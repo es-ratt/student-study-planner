@@ -1,3 +1,13 @@
+<!--
+  notes.html — Rich-text note-taking
+
+  Notes get their own grid layout (like sticky notes) instead of the
+  list-row style used for tasks/assignments, since notes are meant to
+  be skimmed visually. The editor is a plain contenteditable div with
+  a few formatting buttons wired to the browser's built-in
+  document.execCommand() — no rich-text library needed for something
+  this simple (bold, italic, list, code block).
+-->
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
@@ -32,6 +42,8 @@
           <input type="text" id="noteSearch" class="form-control" placeholder="Search notes..." />
         </div>
         <div class="col-md-4">
+          <!-- Options here get filled in dynamically from whatever
+               categories actually exist across the user's notes -->
           <select id="noteCategoryFilter" class="form-select">
             <option value="all">All categories</option>
           </select>
@@ -69,12 +81,16 @@
               </div>
             </div>
             <div class="mb-3">
+              <!-- data-cmd matches a document.execCommand() name directly —
+                   see the click handler below that reads this attribute -->
               <div class="d-flex gap-2 mb-2">
                 <button type="button" class="btn btn-sm btn-outline-secondary" data-cmd="bold"><i class="fa-solid fa-bold"></i></button>
                 <button type="button" class="btn btn-sm btn-outline-secondary" data-cmd="italic"><i class="fa-solid fa-italic"></i></button>
                 <button type="button" class="btn btn-sm btn-outline-secondary" data-cmd="insertUnorderedList"><i class="fa-solid fa-list-ul"></i></button>
                 <button type="button" class="btn btn-sm btn-outline-secondary" id="insertCodeBtn"><i class="fa-solid fa-code"></i></button>
               </div>
+              <!-- contenteditable turns this div into a basic rich-text box —
+                   its innerHTML IS the note's saved content -->
               <div id="noteContent" class="note-editor" contenteditable="true"></div>
             </div>
           </form>
@@ -100,15 +116,18 @@
 
     const noteModal = new bootstrap.Modal(document.getElementById('noteModal'));
 
+    // Fills both the modal's subject dropdown AND the category filter dropdown.
+    // Category list is rebuilt from the actual notes every time (getCategories()),
+    // so a brand-new category typed into a note shows up as a filter option automatically.
     function populateSelectOptions() {
       document.getElementById('noteSubject').innerHTML = '<option value="">None</option>' +
         getAllSubjects().map((s) => `<option value="${s.id}">${s.name}</option>`).join('');
 
       const categorySelect = document.getElementById('noteCategoryFilter');
-      const current = categorySelect.value;
+      const current = categorySelect.value; // remember what was selected before rebuilding
       categorySelect.innerHTML = '<option value="all">All categories</option>' +
         getCategories().map((c) => `<option value="${c}">${c}</option>`).join('');
-      categorySelect.value = current || 'all';
+      categorySelect.value = current || 'all'; // restore the previous selection if it still exists
     }
 
     function getFilteredNotes() {
@@ -116,9 +135,11 @@
       const category = document.getElementById('noteCategoryFilter').value;
 
       let notes = query ? searchNotes(query) : filterNotesByCategory(category);
+      // Edge case: searching AND filtering by category at the same time —
+      // searchNotes() alone doesn't know about the category filter, so apply it manually here
       if (query && category !== 'all') notes = notes.filter((n) => n.category === category);
 
-      return getSortedNotes(notes);
+      return getSortedNotes(notes); // pinned notes float to the top
     }
 
     function renderNotes() {
@@ -134,6 +155,8 @@
         <div class="note-card ${n.pinned ? 'is-pinned' : ''}" data-id="${n.id}">
           <button class="note-pin-btn ${n.pinned ? 'pinned' : ''}"><i class="fa-solid fa-thumbtack"></i></button>
           <div class="note-title">${escapeHTML(n.title)}</div>
+          <!-- n.content is NOT escaped here on purpose — it's the note's
+               formatted HTML from the rich-text editor, and needs to render as HTML -->
           <div class="note-content">${n.content}</div>
           <span class="note-category-chip">${escapeHTML(n.category)}</span>
           <div class="d-flex gap-2 mt-3">
@@ -164,6 +187,7 @@
           if (!confirm('Delete this note?')) return;
           deleteNote(id);
           showToast('Note deleted', 'success');
+          // category list might have changed if that was the last note in a category
           populateSelectOptions();
           renderNotes();
         });
@@ -174,7 +198,7 @@
       document.getElementById('noteModalTitle').textContent = 'New Note';
       document.getElementById('noteId').value = '';
       document.getElementById('noteForm').reset();
-      document.getElementById('noteContent').innerHTML = '';
+      document.getElementById('noteContent').innerHTML = ''; // reset() doesn't clear contenteditable divs, so this is done manually
       noteModal.show();
     }
 
@@ -208,7 +232,7 @@
       }
 
       noteModal.hide();
-      populateSelectOptions();
+      populateSelectOptions(); // category list may have gained a new entry
       renderNotes();
     }
 
@@ -221,6 +245,8 @@
       document.getElementById('noteSearch').addEventListener('input', renderNotes);
       document.getElementById('noteCategoryFilter').addEventListener('change', renderNotes);
 
+      // Each formatting button just runs the browser's own rich-text command —
+      // no custom bold/italic logic needed
       document.querySelectorAll('#noteForm [data-cmd]').forEach((btn) => {
         btn.addEventListener('click', () => document.execCommand(btn.dataset.cmd, false, null));
       });
@@ -228,6 +254,7 @@
         document.execCommand('insertHTML', false, '<pre><code>your code here</code></pre>');
       });
 
+      // Lets the floating "+" button trigger this page's "new note" modal
       document.addEventListener('quickadd:note', openAddModal);
     });
   </script>
