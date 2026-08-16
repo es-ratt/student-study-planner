@@ -1,3 +1,11 @@
+<!--
+  404.html — Not-found fallback page
+
+  Simplest page in the project: no navbar, no sidebar, no data loading —
+  just a centered message and a link home. It doesn't import app.js at
+  all (unlike every other page), since a broken link shouldn't require
+  a login check or a backend call just to show an error message.
+-->
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
@@ -22,6 +30,8 @@
     <a href="index.html" class="btn btn-primary rounded-pill px-4">Back to Home</a>
   </div>
 
+  <!-- Still applies the saved light/dark theme, even on an error page,
+       so switching pages never causes a jarring flash back to light mode -->
   <script type="module">
     import { initTheme } from '../js/modules/themeManager.js';
     initTheme();
