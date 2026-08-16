@@ -1,3 +1,14 @@
+<!--
+  calendar.html — Unified calendar view
+
+  Pulls tasks, assignments, and exams together into one visual month/
+  week/day calendar using FullCalendar (a third-party library, not
+  something we built) — writing a calendar grid with drag/drop, week
+  numbers, and view switching from scratch would be reinventing a
+  well-solved problem. This page's own job is small: feed FullCalendar
+  the combined event list from calendarManager.js, and let the user
+  add one-off custom events (study sessions, other events) on top.
+-->
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
@@ -26,6 +37,7 @@
       <button class="btn btn-primary rounded-pill px-4" id="addEventBtn"><i class="fa-solid fa-plus me-1"></i>Add Event</button>
     </div>
 
+    <!-- Color key so the calendar's dots are readable without guessing -->
     <div class="calendar-legend">
       <span><span class="legend-dot" style="background:#6c5ce7"></span>Task</span>
       <span><span class="legend-dot" style="background:#ff8a65"></span>Assignment</span>
@@ -34,6 +46,7 @@
       <span><span class="legend-dot" style="background:#f4b942"></span>Event</span>
     </div>
 
+    <!-- FullCalendar renders its entire grid UI inside this empty div -->
     <div id="calendarRoot"></div>
   </main>
 
@@ -54,6 +67,8 @@
             </div>
             <div class="mb-3">
               <label class="form-label">Type</label>
+              <!-- Only these two types are user-creatable here — tasks/assignments/exams
+                   already appear on the calendar automatically from their own pages -->
               <select class="form-select" id="eventType">
                 <option value="study_session">Study Session</option>
                 <option value="event">Event</option>
@@ -84,6 +99,8 @@
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+  <!-- Third-party calendar UI library — handles all the grid rendering,
+       month/week/day view switching, and navigation for us -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.15/index.global.min.js"></script>
   <script type="module" src="../js/app.js"></script>
   <script type="module">
@@ -92,6 +109,8 @@
     import { showToast } from '../js/components/toast.js';
 
     const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+    // Kept at module scope (not inside a function) because refreshCalendar()
+    // needs to reach the same calendar instance that initCalendar() created
     let calendar;
 
     function populateSubjectOptions() {
@@ -100,6 +119,8 @@
         getAllSubjects().map((s) => `<option value="${s.id}">${s.name}</option>`).join('');
     }
 
+    // Creates the FullCalendar instance once, with our combined event list
+    // (tasks + assignments + exams + custom events) as the starting data
     function initCalendar() {
       const el = document.getElementById('calendarRoot');
       calendar = new FullCalendar.Calendar(el, {
@@ -111,6 +132,9 @@
       calendar.render();
     }
 
+    // After adding a new custom event, wipe and re-add everything rather
+    // than trying to patch in just the one new event — simpler, and the
+    // event count here is small enough that this isn't a performance concern
     function refreshCalendar() {
       calendar.removeAllEvents();
       getCalendarEvents().forEach((ev) => calendar.addEvent(ev));
@@ -135,7 +159,7 @@
           type: document.getElementById('eventType').value,
           subjectId: document.getElementById('eventSubject').value || null,
           date,
-          endDate: document.getElementById('eventEndDate').value || date,
+          endDate: document.getElementById('eventEndDate').value || date, // single-day event if no end date given
         });
 
         showToast('Event added to calendar', 'success');
