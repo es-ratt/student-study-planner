@@ -1,3 +1,13 @@
+<!--
+  pomodoro.html — Focus timer
+
+  A 25-minute focus / 5-minute break timer (the classic Pomodoro
+  Technique). The circular progress ring is plain SVG, animated by
+  changing stroke-dashoffset every second — no animation library
+  needed for a single spinning ring. Every completed FOCUS session
+  (not breaks) gets logged via recordSession(), which is what feeds
+  the study-hours chart back on the dashboard.
+-->
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
@@ -27,11 +37,14 @@
 
     <div class="pomodoro-wrap">
       <div class="mb-3">
+        <!-- Which subject the current focus session should be credited to -->
         <select id="pomodoroSubject" class="form-select">
           <option value="">No subject</option>
         </select>
       </div>
 
+      <!-- Two overlapping circles: a static gray background ring, and a
+           colored progress ring drawn on top of it that "empties" over time -->
       <div class="timer-ring">
         <svg viewBox="0 0 260 260">
           <circle class="ring-bg" cx="130" cy="130" r="115"></circle>
@@ -48,6 +61,7 @@
         <button class="btn btn-outline-secondary" id="resetBtn" aria-label="Reset"><i class="fa-solid fa-rotate-left"></i></button>
       </div>
 
+      <!-- Small dots showing progress toward a "long break" (every N sessions) -->
       <div class="session-dots" id="sessionDots"></div>
       <p class="text-muted-custom small mt-3" id="sessionCountText">0 sessions completed today</p>
     </div>
@@ -63,20 +77,29 @@
     import { requestNotificationPermission, showNotification } from '../js/modules/settingsManager.js';
     import { showToast } from '../js/components/toast.js';
 
+    // Focus/break lengths and "sessions before a long break" come from
+    // user settings (getConfig()), not hardcoded, so this page respects
+    // whatever the user configured on the Settings page
     const config = getConfig();
     const RADIUS = 115;
+    // Total length of the SVG circle's outline — needed to convert
+    // "percent complete" into a dash-offset value the browser understands
     const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
-    let mode = 'focus'; // 'focus' | 'break'
+    let mode = 'focus'; // 'focus' | 'break' — which phase we're currently in
     let secondsLeft = config.focusMinutes * 60;
-    let totalSeconds = secondsLeft;
-    let timerInterval = null;
+    let totalSeconds = secondsLeft; // kept so we can calculate "% done" even as secondsLeft counts down
+    let timerInterval = null; // holds the setInterval() id so we can clearInterval() it later
     let isRunning = false;
 
     const ring = document.getElementById('ringProgress');
+    // Draw the ring as one long dash exactly as long as its own circumference,
+    // then we "hide" portions of it by offsetting the dash — this is the
+    // standard CSS trick for an animated circular progress ring
     ring.style.strokeDasharray = `${CIRCUMFERENCE}`;
     ring.style.strokeDashoffset = '0';
 
+    // Updates the mm:ss text and moves the progress ring — called every tick
     function updateDisplay() {
       const minutes = Math.floor(secondsLeft / 60);
       const seconds = secondsLeft % 60;
@@ -87,6 +110,9 @@
       ring.style.strokeDashoffset = `${CIRCUMFERENCE * (1 - progress)}`;
     }
 
+    // Draws the small "sessions before long break" dots — fills in one
+    // dot per completed session, wrapping around using modulo so it
+    // resets visually after every long-break cycle
     function renderSessionDots() {
       const count = getTodaySessionCount();
       const dotsWrap = document.getElementById('sessionDots');
@@ -96,6 +122,7 @@
       document.getElementById('sessionCountText').textContent = `${count} session${count === 1 ? '' : 's'} completed today`;
     }
 
+    // Runs once per second while the timer is active
     function tick() {
       secondsLeft--;
       if (secondsLeft < 0) {
@@ -105,29 +132,39 @@
       updateDisplay();
     }
 
+    // Called when the countdown hits zero — logs the session (if it was
+    // a focus session, not a break), notifies the user, then flips into
+    // the opposite mode and resets the clock for it
     function completeSession() {
       clearInterval(timerInterval);
       isRunning = false;
 
       const durationMinutes = mode === 'focus' ? config.focusMinutes : config.breakMinutes;
       if (mode === 'focus') {
+        // Only focus time counts toward study-hours stats — breaks don't get logged
         recordSession({ type: 'focus', durationMinutes, subjectId: document.getElementById('pomodoroSubject').value || null });
       }
 
+      // Both a real browser notification AND an in-page toast — the
+      // notification works even if the user tabbed away, the toast is
+      // the fallback for when notifications aren't permitted
       showNotification(mode === 'focus' ? 'Focus session complete!' : 'Break is over!', {
         body: mode === 'focus' ? 'Time for a short break.' : 'Back to focus time.',
       });
       showToast(mode === 'focus' ? 'Focus session complete — take a break!' : 'Break over — back to it!', 'success');
 
+      // Flip to the other mode and reset the clock for it
       mode = mode === 'focus' ? 'break' : 'focus';
       secondsLeft = (mode === 'focus' ? config.focusMinutes : config.breakMinutes) * 60;
       totalSeconds = secondsLeft;
 
       updateDisplay();
       renderSessionDots();
-      setStartButton(false);
+      setStartButton(false); // timer auto-pauses between sessions, doesn't auto-continue
     }
 
+    // Swaps the play/pause icon and its accessibility label together,
+    // so screen readers announce the correct action
     function setStartButton(running) {
       const btn = document.getElementById('startPauseBtn');
       btn.innerHTML = running ? '<i class="fa-solid fa-pause"></i>' : '<i class="fa-solid fa-play"></i>';
@@ -146,6 +183,7 @@
       timerInterval = setInterval(tick, 1000);
     }
 
+    // Resets fully back to a fresh focus session, no matter what mode/time was showing
     function resetTimer() {
       clearInterval(timerInterval);
       isRunning = false;
@@ -162,6 +200,8 @@
 
       updateDisplay();
       renderSessionDots();
+      // Ask for notification permission up front, so the "session complete"
+      // alert can actually fire later without an extra permission prompt mid-timer
       requestNotificationPermission();
 
       document.getElementById('startPauseBtn').addEventListener('click', toggleTimer);
