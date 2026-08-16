@@ -1,7 +1,13 @@
-/* components.css
-   Shared shell + widget styles used across every logged-in page:
-   navbar, sidebar, FAB, cards, badges, empty states. Page-specific
-   layout tweaks live in their own file (dashboard.css, notes.css, etc). */
+/*
+  components.css — Shared UI shell + widget styles
+
+  Every logged-in page (dashboard, planner, subjects, etc.) shares
+  the same navbar/sidebar/FAB shell and the same "look" for cards,
+  badges, list rows, and empty states — all of that lives here, once.
+  Page-specific layout that only ONE page needs (like the calendar
+  grid or the notes masonry layout) lives in its own separate file
+  instead, to keep this file from becoming a dumping ground.
+*/
 
 /* ---------- App shell ---------- */
 
@@ -12,6 +18,8 @@
 }
 
 .sidebar {
+  /* Fixed + positioned below the navbar so it doesn't scroll with the
+     page content and never overlaps the navbar at the top */
   position: fixed;
   top: var(--navbar-height);
   left: 0;
@@ -36,12 +44,16 @@
   color: var(--color-text);
 }
 
+/* Highlights whichever page the user is currently on —
+   navbar.js/sidebar.js add this class to the matching link */
 .sidebar .nav-link.active {
   background: var(--accent-color);
   color: #fff;
 }
 
 .main-content {
+  /* Pushed right by exactly the sidebar's width so content never
+     renders underneath the fixed sidebar */
   margin-left: var(--sidebar-width);
   padding: 28px 32px 80px;
   min-height: calc(100vh - var(--navbar-height));
@@ -67,7 +79,7 @@
   position: fixed;
   right: 28px;
   bottom: 28px;
-  z-index: 1030;
+  z-index: 1030; /* above the sidebar (1020) so it's always clickable */
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -82,6 +94,8 @@
   transition: transform 0.2s ease;
 }
 
+/* Rotates the "+" icon into an "x" shape when the FAB menu is open —
+   fab.js toggles this class, no icon-swapping needed */
 .fab-main-open {
   transform: rotate(45deg);
 }
@@ -108,7 +122,7 @@
   border-radius: var(--radius-md);
   padding: 20px;
   box-shadow: var(--shadow-soft);
-  height: 100%;
+  height: 100%; /* so 4 stat cards in a row all match height even with uneven content */
 }
 
 .stat-card .stat-icon {
@@ -144,7 +158,7 @@
   margin-bottom: 16px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-between; /* title on the left, "View all" link on the right */
 }
 
 /* ---------- Badges / tags ---------- */
@@ -158,6 +172,9 @@
   letter-spacing: 0.03em;
 }
 
+/* Each priority level gets its own soft-tinted background + matching
+   text color — 15-18% opacity keeps them readable without looking
+   like a harsh solid-color alert box */
 .priority-high { background: rgba(229, 86, 111, 0.15); color: var(--color-danger); }
 .priority-medium { background: rgba(244, 185, 66, 0.18); color: #a16f00; }
 .priority-low { background: rgba(51, 182, 121, 0.15); color: var(--color-success); }
@@ -206,7 +223,7 @@
   height: 10px;
   border-radius: 50%;
   display: inline-block;
-  flex-shrink: 0;
+  flex-shrink: 0; /* prevents the dot from squishing when the row's text is long */
 }
 
 /* ---------- Empty states ---------- */
