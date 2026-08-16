@@ -1,3 +1,12 @@
+<!--
+  assignments.html — Manage assignments
+
+  Same overall pattern as planner.html (search + filter + a shared
+  add/edit modal), but for assignments instead of tasks. The two extra
+  fields assignments have that tasks don't are a submission link and a
+  status (pending/completed) rather than a simple completed checkbox —
+  status also drives the overdue/pending/completed badge coloring.
+-->
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
@@ -25,6 +34,7 @@
       <button class="btn btn-primary rounded-pill px-4" id="addAssignmentBtn"><i class="fa-solid fa-plus me-1"></i>Add Assignment</button>
     </div>
 
+    <!-- Search box + status/priority filters -->
     <div class="widget-card mb-3">
       <div class="row g-2">
         <div class="col-md-6">
@@ -53,6 +63,7 @@
 
   <div id="fabRoot"></div>
 
+  <!-- Shared add/edit modal, same pattern as the task modal -->
   <div class="modal fade" id="assignmentModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -112,12 +123,15 @@
 
     const assignmentModal = new bootstrap.Modal(document.getElementById('assignmentModal'));
 
+    // Fills the modal's "Subject" dropdown
     function populateSubjectOptions() {
       const select = document.getElementById('assignmentSubject');
       select.innerHTML = '<option value="">None</option>' +
         getAllSubjects().map((s) => `<option value="${s.id}">${s.name}</option>`).join('');
     }
 
+    // Applies search, then status filter, then priority filter,
+    // and finally sorts everything by deadline (soonest first)
     function getFiltered() {
       const query = document.getElementById('assignmentSearch').value;
       const status = document.getElementById('assignmentStatusFilter').value;
@@ -143,6 +157,8 @@
       container.innerHTML = list.map((a) => {
         const subject = a.subjectId ? getSubjectById(a.subjectId) : null;
         const overdue = isOverdueAssignment(a);
+        // Priority order matters here: completed beats overdue beats pending,
+        // so a completed-but-technically-past-deadline item still shows green
         const statusClass = a.status === 'completed' ? 'status-completed' : overdue ? 'status-overdue' : 'status-pending';
         const statusText = a.status === 'completed' ? 'Completed' : formatCountdown(a.deadline);
         return `
@@ -243,6 +259,7 @@
         document.getElementById(id).addEventListener('change', renderList);
       });
 
+      // Lets the floating "+" button trigger this page's add-assignment modal
       document.addEventListener('quickadd:assignment', openAddModal);
     });
   </script>
