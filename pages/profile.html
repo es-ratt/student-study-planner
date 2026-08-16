@@ -1,3 +1,12 @@
+<!--
+  profile.html — View/edit account details
+
+  Shows and updates the logged-in user's profile (name, university,
+  department, semester, study goal). getCurrentUser() reads from
+  authManager.js's in-memory cache — it's synchronous by design, but
+  that cache only gets filled in once appReady resolves, so the page
+  waits for that before calling loadProfile() at all.
+-->
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
@@ -26,6 +35,8 @@
       <div class="col-lg-8">
         <div class="widget-card">
           <div class="d-flex align-items-center gap-3 mb-4">
+            <!-- Simple "avatar" — just the first letter of the user's name,
+                 no image upload feature exists, so this is a reliable fallback -->
             <div class="rounded-circle d-flex align-items-center justify-content-center"
                  style="width:72px;height:72px;background:var(--accent-color);color:#fff;font-size:1.6rem;font-weight:700;" id="avatarInitial">?</div>
             <div>
@@ -71,8 +82,14 @@
   <script type="module">
     import { getCurrentUser, updateProfile } from '../js/modules/authManager.js';
     import { showToast } from '../js/components/toast.js';
+    // appReady resolves once the login session AND all app data have
+    // loaded — waiting on it here guarantees getCurrentUser() below
+    // won't return null just because the page rendered too early
     import { appReady } from '../js/app.js';
 
+    // Pulls the current user out of authManager's cache and fills every
+    // field on the page — also used again after a successful save, so
+    // the displayed name/avatar update immediately without a page reload
     function loadProfile() {
       const user = getCurrentUser();
       if (!user) return;
@@ -94,6 +111,8 @@
 
       document.getElementById('profileForm').addEventListener('submit', async (e) => {
         e.preventDefault();
+        // updateProfile() is async — it's a real network call to PUT /api/auth/me,
+        // not a local-only change, since account data lives on the server
         const result = await updateProfile({
           name: document.getElementById('profileName').value.trim(),
           university: document.getElementById('profileUniversity').value.trim(),
@@ -104,7 +123,7 @@
 
         if (result.success) {
           showToast('Profile updated', 'success');
-          loadProfile();
+          loadProfile(); // re-fill the display fields (name/avatar) with the saved values
         } else {
           showToast(result.error, 'error');
         }
