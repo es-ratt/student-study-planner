@@ -1,3 +1,12 @@
+<!--
+  planner.html — Full task management page
+
+  This is the "real" task manager — unlike the dashboard's quick-add,
+  this page shows every task with search, filter (by priority/status),
+  and sort controls, plus a full add/edit modal with subject, priority,
+  deadline, and notes fields. Add/Edit/Delete all update the shared
+  storage layer, so changes here also show up on the dashboard.
+-->
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
@@ -25,6 +34,7 @@
       <button class="btn btn-primary rounded-pill px-4" id="addTaskBtn"><i class="fa-solid fa-plus me-1"></i>Add Task</button>
     </div>
 
+    <!-- Search box + 3 dropdowns: priority filter, status filter, sort order -->
     <div class="widget-card mb-3">
       <div class="row g-2 align-items-center">
         <div class="col-md-4">
@@ -55,11 +65,14 @@
       </div>
     </div>
 
+    <!-- renderTaskList() below fills this with one row per task -->
     <div id="taskList"></div>
   </main>
 
   <div id="fabRoot"></div>
 
+  <!-- Shared modal for BOTH adding a new task and editing an existing one —
+       which mode it's in depends on whether #taskId has a value (see openAddModal/openEditModal) -->
   <div class="modal fade" id="taskModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -69,6 +82,7 @@
         </div>
         <div class="modal-body">
           <form id="taskForm">
+            <!-- Hidden field: empty means "adding new", filled means "editing this id" -->
             <input type="hidden" id="taskId" />
             <div class="mb-3">
               <label class="form-label">Task Title *</label>
@@ -118,20 +132,25 @@
     import { showToast } from '../js/components/toast.js';
     import { appReady } from '../js/app.js';
 
+    // One shared Bootstrap Modal instance, reused for both add and edit
     const taskModal = new bootstrap.Modal(document.getElementById('taskModal'));
 
+    // Fills the "Subject" dropdown inside the modal with every subject the user has
     function populateSubjectOptions() {
       const select = document.getElementById('taskSubject');
       select.innerHTML = '<option value="">None</option>' +
         getAllSubjects().map((s) => `<option value="${s.id}">${s.name}</option>`).join('');
     }
 
+    // Reads the current values of the search box + 3 dropdowns and returns
+    // the task list after search, filtering, and sorting have all been applied
     function getFilteredTasks() {
       const query = document.getElementById('taskSearch').value;
       const priority = document.getElementById('taskPriorityFilter').value;
       const status = document.getElementById('taskStatusFilter').value;
       const sortBy = document.getElementById('taskSort').value;
 
+      // Search first (if there's a query), otherwise start from the full list
       let tasks = query ? searchTasks(query) : getAllTasks();
 
       tasks = tasks.filter((t) => {
@@ -144,6 +163,9 @@
       return sortTasks(tasks, sortBy);
     }
 
+    // Rebuilds the entire task list in the DOM from scratch —
+    // simple to reason about, and this app's data sizes are small enough
+    // that a full re-render on every change is not a performance problem
     function renderTaskList() {
       const container = document.getElementById('taskList');
       const tasks = getFilteredTasks();
@@ -169,9 +191,13 @@
           </div>`;
       }).join('');
 
+      // Since we rebuilt the HTML above, every button/checkbox is brand new —
+      // event listeners have to be re-attached after every render
       attachRowEvents();
     }
 
+    // Wires up the checkbox/edit/delete buttons on each row.
+    // Uses data-id on the row + closest() to find which task a click belongs to.
     function attachRowEvents() {
       document.querySelectorAll('.task-complete-cb').forEach((cb) => {
         cb.addEventListener('change', (e) => {
@@ -188,7 +214,7 @@
       document.querySelectorAll('.delete-task-btn').forEach((btn) => {
         btn.addEventListener('click', (e) => {
           const id = e.target.closest('.list-row').dataset.id;
-          if (!confirm('Delete this task?')) return;
+          if (!confirm('Delete this task?')) return; // simple native confirm — good enough for a delete action
           deleteTask(id);
           showToast('Task deleted', 'success');
           renderTaskList();
@@ -196,6 +222,7 @@
       });
     }
 
+    // Opens the modal in "add" mode: clears every field, including the hidden id
     function openAddModal() {
       document.getElementById('taskModalTitle').textContent = 'Add Task';
       document.getElementById('taskId').value = '';
@@ -203,6 +230,8 @@
       taskModal.show();
     }
 
+    // Opens the modal in "edit" mode: looks up the task by id and
+    // pre-fills every field with its current values
     function openEditModal(id) {
       const task = getTaskById(id);
       if (!task) return;
@@ -216,6 +245,8 @@
       taskModal.show();
     }
 
+    // Runs when "Save Task" is clicked — decides add vs update
+    // based on whether the hidden #taskId field has a value
     function saveTask() {
       const id = document.getElementById('taskId').value;
       const title = document.getElementById('taskTitle').value.trim();
@@ -238,21 +269,26 @@
       }
 
       taskModal.hide();
-      renderTaskList();
+      renderTaskList(); // refresh the list so the change is visible immediately
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
-      await appReady;
+      await appReady; // wait for session + data to load before rendering anything
+
       populateSubjectOptions();
       renderTaskList();
 
       document.getElementById('addTaskBtn').addEventListener('click', openAddModal);
       document.getElementById('saveTaskBtn').addEventListener('click', saveTask);
+
+      // Re-render the list live as the user types/changes any filter control
       ['taskSearch', 'taskPriorityFilter', 'taskStatusFilter', 'taskSort'].forEach((id) => {
         document.getElementById(id).addEventListener('input', renderTaskList);
         document.getElementById(id).addEventListener('change', renderTaskList);
       });
 
+      // Lets other parts of the app (e.g. the floating "+" button) open
+      // this page's add-task modal by firing a custom event
       document.addEventListener('quickadd:task', openAddModal);
     });
   </script>
