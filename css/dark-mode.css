@@ -1,7 +1,13 @@
-/* dark-mode.css
-   Overrides the CSS variables from base.css when [data-theme="dark"]
-   is set on <html> — themeManager.js toggles that attribute.
-   Nothing here defines new component styles, only re-points variables. */
+/*
+  dark-mode.css — Dark theme overrides
+
+  When themeManager.js sets data-theme="dark" on <html>, this file
+  redefines the SAME CSS variable names from base.css to darker colors —
+  it never introduces new variables, it just re-points the existing ones.
+  Below the variable block are extra overrides for Bootstrap components
+  (modals, dropdowns, tables) that come with their own hardcoded light
+  styles Bootstrap ships with, which our variables alone can't reach.
+*/
 
 [data-theme="dark"] {
   --color-bg: #14121f;
@@ -19,6 +25,10 @@
   --shadow-strong: 0 16px 40px rgba(0, 0, 0, 0.5);
 }
 
+/* The landing page's hero preview card has an inline light-gray
+   background baked into its HTML (style="background:#f6f5fb") — a CSS
+   variable can't override an inline style's specific hex value, so this
+   targets that exact inline style directly with !important */
 [data-theme="dark"] .hero-mock-card {
   background: rgba(30, 28, 46, 0.95);
 }
@@ -31,6 +41,8 @@
   background: var(--color-border);
 }
 
+/* Bootstrap's hamburger icon is a black SVG baked into its own CSS —
+   inverting its colors is simpler than fighting to recolor the SVG itself */
 [data-theme="dark"] .navbar-toggler-icon {
   filter: invert(1);
 }
@@ -92,6 +104,8 @@
   border-color: var(--color-border);
 }
 
+/* Bootstrap's modal close "X" is a black SVG too — same invert trick as
+   the navbar toggler above, plus brightness to push it fully to white */
 [data-theme="dark"] .btn-close {
   filter: invert(1) grayscale(100%) brightness(200%);
 }
@@ -123,6 +137,9 @@
   border-color: var(--color-border);
 }
 
+/* Bootstrap tables paint each individual cell, not just the table
+   element — this selector reaches every cell in the body, which a
+   simpler ".table td" rule doesn't fully override */
 [data-theme="dark"] .table > :not(caption) > * > * {
   background-color: var(--color-surface);
   color: var(--color-text);
@@ -159,6 +176,10 @@
   border-color: var(--color-border);
 }
 
+/* Catches any element still using Bootstrap's raw bg-white/bg-light/
+   text-dark utility classes directly in the HTML, instead of our
+   theme variables — !important is required here because Bootstrap's
+   own utility classes are already marked !important */
 [data-theme="dark"] .bg-white,
 [data-theme="dark"] .bg-light {
   background-color: var(--color-surface) !important;
