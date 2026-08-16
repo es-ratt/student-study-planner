@@ -1,29 +1,38 @@
-/* base.css
-   Design tokens (CSS variables) + global resets shared by every page.
-   Every other CSS file builds on top of these variables — never
-   hardcode a color/spacing value directly in a page-specific file. */
+/*
+  base.css — Design tokens + global resets
+
+  Every color, font, spacing, and radius used ANYWHERE in the app is
+  defined once here as a CSS variable, and every other stylesheet
+  references these variables instead of hardcoding values directly.
+  This is what makes dark mode possible with a small override file
+  (dark-mode.css) instead of duplicating every single CSS file — dark
+  mode just redefines these same variable names to different colors.
+*/
 
 :root {
   /* ---------- Palette ---------- */
-  --color-bg: #f6f5fb;
-  --color-surface: #ffffff;
-  --color-surface-glass: rgba(255, 255, 255, 0.6);
+  --color-bg: #f6f5fb;                              /* page background */
+  --color-surface: #ffffff;                         /* cards, modals, inputs */
+  --color-surface-glass: rgba(255, 255, 255, 0.6);  /* frosted-glass navbar effect */
   --color-text: #1e1b2e;
   --color-text-muted: #635f78;
   --color-border: #e4e1f0;
 
-  --color-primary: #6c5ce7;
-  --color-primary-dark: #5641d8;
+  --color-primary: #6c5ce7;       /* main brand purple */
+  --color-primary-dark: #5641d8;  /* hover state for primary buttons */
   --color-secondary: #ff8a65;
   --color-success: #33b679;
   --color-warning: #f4b942;
   --color-danger: #e5566f;
 
+  /* accent-color is a SEPARATE variable from primary, on purpose —
+     Settings lets the user pick a custom accent color, which only
+     updates this one variable, leaving --color-primary untouched */
   --accent-color: var(--color-primary);
 
   /* ---------- Typography ---------- */
-  --font-display: 'Sora', sans-serif;
-  --font-body: 'Inter', sans-serif;
+  --font-display: 'Sora', sans-serif;  /* headings */
+  --font-body: 'Inter', sans-serif;    /* everything else */
 
   /* ---------- Layout ---------- */
   --radius-sm: 8px;
@@ -35,6 +44,8 @@
   --navbar-height: 64px;
 }
 
+/* border-box everywhere avoids the classic "padding makes elements
+   wider than expected" headache with width/height calculations */
 * {
   box-sizing: border-box;
 }
@@ -44,6 +55,7 @@ body {
   font-family: var(--font-body);
   background-color: var(--color-bg);
   color: var(--color-text);
+  /* Smooth fade instead of an instant snap when toggling dark mode */
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
@@ -57,15 +69,18 @@ a {
   text-decoration: none;
 }
 
+/* Frosted-glass effect used on the landing page navbar and a few
+   floating panels — blur + translucency + a soft shadow */
 .glass-surface {
   background: var(--color-surface-glass);
   backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px); /* Safari still needs the prefix */
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-soft);
 }
 
+/* Overrides Bootstrap's default .btn-primary blue with our own accent color */
 .btn-primary {
   background-color: var(--accent-color);
   border-color: var(--accent-color);
@@ -76,6 +91,8 @@ a {
   border-color: var(--color-primary-dark);
 }
 
+/* Thin custom scrollbar (Chrome/Edge/Safari only — Firefox ignores
+   ::-webkit- prefixed rules and just uses its own default scrollbar) */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -89,10 +106,13 @@ a {
   color: var(--color-text-muted);
 }
 
+/* Generous vertical spacing for landing-page sections on desktop... */
 .section-padding {
   padding: 96px 0;
 }
 
+/* ...but that much padding wastes precious space on small screens,
+   so it's cut down significantly below the tablet breakpoint */
 @media (max-width: 768px) {
   .section-padding {
     padding: 56px 0;
