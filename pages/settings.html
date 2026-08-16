@@ -1,3 +1,12 @@
+<!--
+  settings.html — App preferences and account controls
+
+  Two groups of settings (appearance, notifications) plus a "danger
+  zone" for wiping local data and a logout button. Every toggle here
+  saves immediately on change — there's no separate "Save Settings"
+  button, since each setting is small and independent enough that
+  instant save/feedback feels better than batching them.
+-->
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
@@ -80,6 +89,9 @@
     import { logoutUser } from '../js/modules/authManager.js';
     import { showToast } from '../js/components/toast.js';
 
+    // Reads every current setting and puts it into its matching control —
+    // called once on load so the page shows the user's actual saved preferences,
+    // not just each control's default state
     function loadSettings() {
       document.getElementById('darkModeSwitch').checked = getCurrentTheme() === 'dark';
       document.getElementById('accentColorPicker').value = getAccentColor();
@@ -98,12 +110,16 @@
         showToast('Theme updated', 'success');
       });
 
+      // "input" fires on every drag of the color picker, giving a live preview
+      // instead of only updating once the user closes the picker
       document.getElementById('accentColorPicker').addEventListener('input', (e) => {
         setAccentColor(e.target.value);
       });
 
       document.getElementById('notificationsSwitch').addEventListener('change', async (e) => {
         updateSettings({ notificationsEnabled: e.target.checked });
+        // Only prompt for browser permission when turning notifications ON —
+        // no point asking if the user just disabled them
         if (e.target.checked) await requestNotificationPermission();
         showToast('Notification settings updated', 'success');
       });
@@ -113,6 +129,7 @@
       });
 
       document.getElementById('examReminderDays').addEventListener('change', (e) => {
+        // Falls back to 3 if the field is somehow empty/invalid, rather than saving NaN
         updateSettings({ examReminderDaysBefore: parseInt(e.target.value, 10) || 3 });
       });
 
